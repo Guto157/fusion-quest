@@ -394,6 +394,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       };
 
       piece.style.transition = "none";
+      piece.style.willChange = "transform";
       piece.style.zIndex = "10";
       piece.style.filter = "brightness(1.25)";
       gameBoard.setPointerCapture(event.pointerId);
@@ -429,6 +430,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       dragStart = null;
       piece.style.transform = "";
       piece.style.transition = "";
+      piece.style.willChange = "";
       piece.style.zIndex = "";
       piece.style.filter = "";
       swap(start.row, start.col, row, col);
@@ -438,6 +440,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       if (dragStart?.element) {
         dragStart.element.style.transform = "";
         dragStart.element.style.transition = "";
+        dragStart.element.style.willChange = "";
         dragStart.element.style.zIndex = "";
         dragStart.element.style.filter = "";
       }
@@ -470,31 +473,31 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
     const firstAnimation = first.animate(
       reverse
         ? [
-            { transform: `translate(${dx}px, ${dy}px)` },
-            { transform: "translate(0, 0)" }
+            { transform: `translate3d(${dx}px, ${dy}px, 0)` },
+            { transform: "translate3d(0, 0, 0)" }
           ]
         : [
-            { transform: "translate(0, 0)" },
-            { transform: `translate(${dx}px, ${dy}px)` }
+            { transform: "translate3d(0, 0, 0)" },
+            { transform: `translate3d(${dx}px, ${dy}px, 0)` }
           ],
       {
-        duration: 280,
-        easing: "cubic-bezier(0.22, 1, 0.36, 1)"
+        duration: 190,
+        easing: "cubic-bezier(0.2, 0.8, 0.2, 1)"
       }
     );
 
     const secondAnimation = second.animate(
       reverse
         ? [
-            { transform: `translate(${-dx}px, ${-dy}px)` },
-            { transform: "translate(0, 0)" }
+            { transform: `translate3d(${-dx}px, ${-dy}px, 0)` },
+            { transform: "translate3d(0, 0, 0)" }
           ]
         : [
-            { transform: "translate(0, 0)" },
-            { transform: `translate(${-dx}px, ${-dy}px)` }
+            { transform: "translate3d(0, 0, 0)" },
+            { transform: `translate3d(${-dx}px, ${-dy}px, 0)` }
           ],
       {
-        duration: 280,
+        duration: 190,
         easing: "cubic-bezier(0.22, 1, 0.36, 1)"
       }
     );
