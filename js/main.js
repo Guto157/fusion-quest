@@ -1,5 +1,5 @@
 
-import { startBoard } from "./game/board.js";
+import { startBoard } from "./game/board.js?v=homebtn1";
 
 const header = document.getElementById("header");
 const screen = document.getElementById("screen");
