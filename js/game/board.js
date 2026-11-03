@@ -3,7 +3,7 @@ const SIZE = 7;
 const TYPES = ["💎", "🔵", "🟣", "🟢", "🟡", "🔴"];
 const MAX_MOVES = 20;
 
-export function startBoard(container, onComplete, stage = 1) {
+export function startBoard(container, onComplete, stage = 1, onHome = () => {}) {
   const TARGET = 250 + (stage - 1) * 50;
 
   let board = [];
@@ -724,14 +724,23 @@ export function startBoard(container, onComplete, stage = 1) {
         <div class="board-result">
           <h2>🏆 FASE CONCLUÍDA!</h2>
           <p>Você conseguiu ${score} pontos!</p>
-          <button class="primary-button" id="next-level">
-            CONTINUAR
-          </button>
+          <div class="board-result-actions">
+            <button class="primary-button" id="next-level">
+              CONTINUAR
+            </button>
+            <button class="secondary-button" id="home-level">
+              INÍCIO
+            </button>
+          </div>
         </div>
       `;
 
       container.querySelector("#next-level").addEventListener("click", () => {
         onComplete(score);
+      });
+
+      container.querySelector("#home-level").addEventListener("click", () => {
+        onHome();
       });
 
     } else if (moves <= 0) {
