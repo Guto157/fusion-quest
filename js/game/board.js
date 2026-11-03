@@ -9,7 +9,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
   let board = [];
   let moves = MAX_MOVES;
   let score = 0;
-  let selected = null;
+  let dragStart = null;
   let busy = false;
   let clearing = new Set();
   let message = "Combine 3 ou mais peças iguais!";
@@ -359,7 +359,6 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
           line.map((piece, col) => `
             <button
               class="game-piece
-                ${selected && selected.row === row && selected.col === col ? "selected" : ""}
                 ${clearing.has(`${row},${col}`) ? "clearing" : ""}"
               data-row="${row}"
               data-col="${col}"
@@ -377,13 +376,47 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       </p>
     `;
 
-    container.querySelectorAll(".game-piece").forEach(button => {
-      button.addEventListener("click", () => {
-        handleSelection(
-          Number(button.dataset.row),
-          Number(button.dataset.col)
-        );
-      });
+    const gameBoard = container.querySelector(".game-board");
+
+    gameBoard.addEventListener("pointerdown", event => {
+      const piece = event.target.closest(".game-piece");
+
+      if (!piece || busy || moves <= 0 || score >= TARGET) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+
+      event.preventDefault();
+      dragStart = {
+        row: Number(piece.dataset.row),
+        col: Number(piece.dataset.col)
+      };
+
+      gameBoard.setPointerCapture(event.pointerId);
+    });
+
+    gameBoard.addEventListener("pointerup", event => {
+      if (!dragStart) return;
+
+      const start = dragStart;
+      dragStart = null;
+
+      const element = document.elementFromPoint(event.clientX, event.clientY);
+      const target = element && element.closest(".game-piece");
+
+      if (!target || !gameBoard.contains(target)) return;
+
+      const row = Number(target.dataset.row);
+      const col = Number(target.dataset.col);
+      const distance =
+        Math.abs(start.row - row) +
+        Math.abs(start.col - col);
+
+      if (distance === 1) {
+        swap(start.row, start.col, row, col);
+      }
+    });
+
+    gameBoard.addEventListener("pointercancel", () => {
+      dragStart = null;
     });
   }
 
@@ -442,31 +475,6 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       firstAnimation.finished.catch(() => {}),
       secondAnimation.finished.catch(() => {})
     ]);
-  }
-
-  function handleSelection(row, col) {
-    if (busy || moves <= 0 || score >= TARGET) return;
-
-    if (!selected) {
-      selected = { row, col };
-      render();
-      return;
-    }
-
-    const distance =
-      Math.abs(selected.row - row) +
-      Math.abs(selected.col - col);
-
-    if (distance !== 1) {
-      selected = { row, col };
-      render();
-      return;
-    }
-
-    const first = selected;
-    selected = null;
-
-    swap(first.row, first.col, row, col);
   }
 
   function swap(row1, col1, row2, col2) {
