@@ -110,39 +110,75 @@ function getStageMapInfo(stage) {
 
 function renderHome() {
   const world = Math.ceil(player.stage / 10);
-  const firstStage = (world - 1) * 10 + 1;
-  const completed = player.stage - 1;
-  const stagesHTML = Array.from({length:10},(_,index)=>{
-    const stage=firstStage+index, info=getStageMapInfo(stage);
-    const isCompleted=stage<=completed, isCurrent=stage===player.stage, isLocked=stage>player.stage;
-    const side=index%2===0?"left":"right";
-    const stars="★".repeat(info.stars)+"☆".repeat(5-info.stars);
-    const icon=isLocked?"🔒":isCurrent?"🧙":isCompleted?"🏆":"💎";
-    return `<div class="map-stage-row ${side} ${isCurrent?"current":""} ${isCompleted?"completed":""} ${isLocked?"locked":""}">
-      <button class="map-stage" data-stage="${stage}" ${isLocked?"disabled":""} aria-label="Fase ${stage}${isLocked?", bloqueada":""}">
-        <span class="map-stage-icon">${icon}</span><strong>${stage}</strong><span class="map-stage-stars">${stars}</span>
-      </button>
-      <div class="map-stage-info"><strong>FASE ${stage}</strong><span class="map-difficulty ${info.className}">${info.name}</span>
-        <small>Objetivo: ${info.target.toLocaleString("pt-BR")} pontos</small>
-        ${isLocked?'<small class="locked-label">Complete a fase anterior</small>':isCompleted?'<small class="completed-label">Fase concluída</small>':'<small class="current-label">Sua próxima missão</small>'}
-      </div>${isCurrent?'<span class="player-marker">VOCÊ ESTÁ AQUI</span>':""}
-    </div>`;
-  }).join("");
-  screen.innerHTML = `<div class="map-heading"><div><span class="map-eyebrow">SUA JORNADA</span><h2>🌎 Mundo ${world}</h2><p class="muted">Complete as fases para abrir novos caminhos.</p></div>
-    <div class="map-progress-badge">${completed}/${world*10} <small>concluídas</small></div></div>
-    <div class="map-legend"><span>⭐ Dificuldade</span><span>🔒 Bloqueada</span><span>🏆 Concluída</span></div>
-    <div class="world-map" id="world-map"><div class="map-path"></div>${stagesHTML}
-      <div class="next-world-locked"><span>🔒</span><strong>MUNDO ${world+1}</strong><small>Conclua as 10 fases deste mundo</small></div>
-    </div>
-    <div class="card-panel map-player-progress"><h3>📊 Seu progresso</h3><div class="map-progress-line"><span>Nível ${player.level}</span><span>${player.xp}/100 XP</span></div>
-      <div class="map-xp-track"><div style="width:${Math.min(player.xp,100)}%"></div></div><p class="muted">Escolha uma fase concluída para jogar novamente ou avance na fase atual.</p></div>`;
-  screen.querySelectorAll("[data-stage]").forEach(button=>button.addEventListener("click",()=>{
-    const stage=Number(button.dataset.stage); if(stage>player.stage)return; selectedStage=stage; navigate("game");
-  }));
-  const currentNode=screen.querySelector(".map-stage-row.current"), map=document.getElementById("world-map");
-  if(currentNode&&map) map.scrollTop=Math.max(0,currentNode.offsetTop-115);
-}
+  const worldStart = (world - 1) * 10 + 1;
+  const worldEnd = world * 10;
+  const firstVisible = Math.max(worldStart, Math.min(player.stage - 1, worldEnd - 2));
+  const visibleStages = [firstVisible, firstVisible + 1, firstVisible + 2].filter(stage => stage <= worldEnd);
+  const completedInWorld = Math.max(0, Math.min(10, player.stage - worldStart));
 
+  const stagesHTML = visibleStages.map((stage, index) => {
+    const info = getStageMapInfo(stage);
+    const isCompleted = stage < player.stage;
+    const isCurrent = stage === player.stage;
+    const isLocked = stage > player.stage;
+    const stars = "★".repeat(info.stars) + "☆".repeat(5 - info.stars);
+    const icon = isLocked ? "🔒" : isCurrent ? "🧙" : "🏆";
+    return `
+      <div class="quest-stop stop-${index} ${isCompleted ? "done" : ""} ${isCurrent ? "active" : ""} ${isLocked ? "locked" : ""}">
+        <button class="quest-node" data-stage="${stage}" ${isLocked ? "disabled" : ""} aria-label="Fase ${stage}">
+          <span class="quest-node-icon">${icon}</span>
+          <strong>${stage}</strong>
+        </button>
+        <div class="quest-card">
+          <div class="quest-card-top"><strong>FASE ${stage}</strong><span class="quest-status">${isCompleted ? "CONCLUÍDA" : isCurrent ? "ATUAL" : "BLOQUEADA"}</span></div>
+          <div class="quest-stars">${stars}</div>
+          <div class="quest-difficulty ${info.className}">${info.name}</div>
+          <div class="quest-goal">🎯 Meta: <b>${info.target.toLocaleString("pt-BR")} pontos</b></div>
+        </div>
+      </div>`;
+  }).join("");
+
+  screen.innerHTML = `
+    <section class="world-banner">
+      <div class="world-banner-glow"></div>
+      <div class="world-banner-copy">
+        <span class="map-eyebrow">SUA AVENTURA</span>
+        <h2>MUNDO ${world}</h2>
+        <p>Trilha das Gemas</p>
+      </div>
+      <div class="world-emblem">🏰</div>
+      <div class="world-banner-foot"><span>⭐ ${completedInWorld}/10 fases</span><span>🪙 ${player.coins}</span></div>
+    </section>
+
+    <div class="map-section-heading"><div><strong>Sua jornada</strong><small>Avance pelo caminho e desbloqueie novas fases</small></div><span>🌿</span></div>
+    <section class="quest-map">
+      <div class="quest-land quest-land-one"></div><div class="quest-land quest-land-two"></div>
+      <svg class="quest-route" viewBox="0 0 340 510" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M170 70 C170 135 65 125 65 220 S275 285 275 365 S170 425 170 475" />
+      </svg>
+      ${stagesHTML}
+      <div class="map-more-hint">✨ Continue vencendo para revelar o próximo trecho do caminho</div>
+    </section>
+
+    <section class="map-bottom-card">
+      <div class="map-bottom-icon">🧭</div>
+      <div class="map-bottom-copy"><strong>Seu próximo desafio</strong><span>Fase ${player.stage} • ${getStageMapInfo(player.stage).name}</span></div>
+      <button id="map-play-current">JOGAR <span>›</span></button>
+    </section>
+    <div class="map-account-progress"><span>NÍVEL ${player.level}</span><div class="map-account-track"><i style="width:${Math.min(player.xp,100)}%"></i></div><span>${player.xp}/100 XP</span></div>
+  `;
+
+  screen.querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => {
+    const stage = Number(button.dataset.stage);
+    if (stage > player.stage) return;
+    selectedStage = stage;
+    navigate("game");
+  }));
+  document.getElementById("map-play-current").addEventListener("click", () => {
+    selectedStage = player.stage;
+    navigate("game");
+  });
+}
 function renderGame() {
   screen.innerHTML = `
     <h2 class="section-title">🎮 Fase ${selectedStage}</h2>
@@ -178,7 +214,8 @@ function renderGame() {
 
     savePlayer();
 
-    navigate("game");
+    selectedStage = player.stage;
+    navigate("home");
 
     if (cardReward.duplicate) {
       showToast("Fase concluída! +" + earnedCoins + " moedas e coleção completa.");
