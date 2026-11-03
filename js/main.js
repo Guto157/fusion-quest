@@ -1,4 +1,6 @@
 
+import { startBoard } from "./game/board.js";
+
 const header = document.getElementById("header");
 const screen = document.getElementById("screen");
 const navigation = document.getElementById("navigation");
@@ -12,26 +14,11 @@ const player = {
 let currentScreen = "home";
 
 const screens = {
-  home: {
-    title: "Início",
-    icon: "🏠"
-  },
-  game: {
-    title: "Jogar",
-    icon: "🎮"
-  },
-  collection: {
-    title: "Cartas",
-    icon: "🃏"
-  },
-  rewards: {
-    title: "Prêmios",
-    icon: "🎁"
-  },
-  settings: {
-    title: "Ajustes",
-    icon: "⚙️"
-  }
+  home: { title: "Início", icon: "🏠" },
+  game: { title: "Jogar", icon: "🎮" },
+  collection: { title: "Cartas", icon: "🃏" },
+  rewards: { title: "Prêmios", icon: "🎁" },
+  settings: { title: "Ajustes", icon: "⚙️" }
 };
 
 function savePlayer() {
@@ -96,7 +83,7 @@ function renderHome() {
 
     <div class="card-panel">
       <h3 class="section-title">🎯 Sua missão</h3>
-      <p class="muted">Entre no jogo e complete sua primeira fase!</p>
+      <p class="muted">Complete fases para ganhar moedas e experiência!</p>
     </div>
   `;
 
@@ -107,19 +94,44 @@ function renderHome() {
 
 function renderGame() {
   screen.innerHTML = `
-    <h2 class="section-title">🎮 Aventura</h2>
-    <div class="card-panel" style="text-align:center;padding:30px 18px;">
-      <div style="font-size:65px;margin-bottom:15px;">🧩</div>
-      <h2 style="margin-bottom:12px;">Fase ${player.level}</h2>
-      <p class="muted">Prepare-se para combinar peças e superar desafios!</p>
-      <button class="primary-button" id="start-level" style="margin-top:25px;">
-        INICIAR FASE
-      </button>
-    </div>
+    <h2 class="section-title">🎮 Fase ${player.level}</h2>
+    <div id="board-container"></div>
   `;
 
-  document.getElementById("start-level").addEventListener("click", () => {
-    showToast("O tabuleiro será implementado na próxima etapa!");
+  const boardContainer = document.getElementById("board-container");
+
+  startBoard(boardContainer, (score) => {
+    const earnedCoins = 100;
+    const earnedXP = 50;
+
+    player.coins += earnedCoins;
+    player.xp += earnedXP;
+
+    if (player.xp >= 100) {
+      player.xp -= 100;
+      player.level++;
+      showToast("🎉 Você subiu de nível!");
+    }
+
+    savePlayer();
+
+    screen.innerHTML = `
+      <div class="card-panel" style="text-align:center;padding:30px 18px;">
+        <div style="font-size:65px;">🏆</div>
+        <h2 style="margin:15px 0;">Fase concluída!</h2>
+        <p class="muted">Pontuação: ${score}</p>
+        <p style="margin-top:15px;color:#ffd166;">🪙 +${earnedCoins} moedas</p>
+        <p style="margin-top:8px;color:#20d9c2;">⭐ +${earnedXP} XP</p>
+        <button class="primary-button" id="home-button" style="margin-top:25px;">
+          CONTINUAR
+        </button>
+      </div>
+    `;
+
+    document.getElementById("home-button").addEventListener("click", () => {
+      navigate("home");
+      showToast("Recompensas adicionadas!");
+    });
   });
 }
 
