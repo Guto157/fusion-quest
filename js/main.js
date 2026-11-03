@@ -1,5 +1,5 @@
 
-import { startBoard } from "./game/board.js?v=drag-follow1";
+import { startBoard } from "./game/board.js?v=swap-smooth1";
 
 const header = document.getElementById("header");
 const screen = document.getElementById("screen");
