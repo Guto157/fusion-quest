@@ -220,7 +220,7 @@ export function startBoard(container, onComplete) {
           finishTurn();
         }
       }, 180);
-    }, 350);
+    }, 600);
   }
 
   function finishTurn() {
