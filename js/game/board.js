@@ -150,56 +150,61 @@ export function startBoard(container, onComplete) {
     });
   }
 
-  function animateBoardChange(row1, col1, row2, col2, callback) {
-    const firstOld = container.querySelector(
+  function animateSwap(row1, col1, row2, col2, reverse = false) {
+    const first = container.querySelector(
       `[data-row="${row1}"][data-col="${col1}"]`
     );
 
-    const secondOld = container.querySelector(
+    const second = container.querySelector(
       `[data-row="${row2}"][data-col="${col2}"]`
     );
 
-    const firstRect = firstOld.getBoundingClientRect();
-    const secondRect = secondOld.getBoundingClientRect();
+    if (!first || !second) {
+      return Promise.resolve();
+    }
 
-    render();
+    const firstRect = first.getBoundingClientRect();
+    const secondRect = second.getBoundingClientRect();
 
-    const firstNew = container.querySelector(
-      `[data-row="${row1}"][data-col="${col1}"]`
+    const dx = secondRect.left - firstRect.left;
+    const dy = secondRect.top - firstRect.top;
+
+    const firstAnimation = first.animate(
+      reverse
+        ? [
+            { transform: `translate(${dx}px, ${dy}px)` },
+            { transform: "translate(0, 0)" }
+          ]
+        : [
+            { transform: "translate(0, 0)" },
+            { transform: `translate(${dx}px, ${dy}px)` }
+          ],
+      {
+        duration: 280,
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)"
+      }
     );
 
-    const secondNew = container.querySelector(
-      `[data-row="${row2}"][data-col="${col2}"]`
+    const secondAnimation = second.animate(
+      reverse
+        ? [
+            { transform: `translate(${-dx}px, ${-dy}px)` },
+            { transform: "translate(0, 0)" }
+          ]
+        : [
+            { transform: "translate(0, 0)" },
+            { transform: `translate(${-dx}px, ${-dy}px)` }
+          ],
+      {
+        duration: 280,
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)"
+      }
     );
 
-    firstNew.style.transition = "none";
-    secondNew.style.transition = "none";
-
-    firstNew.style.transform =
-      `translate(${secondRect.left - firstRect.left}px, ${secondRect.top - firstRect.top}px)`;
-
-    secondNew.style.transform =
-      `translate(${firstRect.left - secondRect.left}px, ${firstRect.top - secondRect.top}px)`;
-
-    firstNew.offsetWidth;
-
-    firstNew.style.transition =
-      "transform 230ms cubic-bezier(0.22, 1, 0.36, 1)";
-
-    secondNew.style.transition =
-      "transform 230ms cubic-bezier(0.22, 1, 0.36, 1)";
-
-    firstNew.style.transform = "translate(0, 0)";
-    secondNew.style.transform = "translate(0, 0)";
-
-    setTimeout(() => {
-      firstNew.style.transition = "";
-      secondNew.style.transition = "";
-      firstNew.style.transform = "";
-      secondNew.style.transform = "";
-
-      callback();
-    }, 250);
+    return Promise.all([
+      firstAnimation.finished.catch(() => {}),
+      secondAnimation.finished.catch(() => {})
+    ]);
   }
 
   function handleSelection(row, col) {
@@ -228,6 +233,8 @@ export function startBoard(container, onComplete) {
   }
 
   function swap(row1, col1, row2, col2) {
+    if (busy) return;
+
     const temp = board[row1][col1];
     board[row1][col1] = board[row2][col2];
     board[row2][col2] = temp;
@@ -235,26 +242,30 @@ export function startBoard(container, onComplete) {
     busy = true;
 
     if (findMatches().length === 0) {
-      animateBoardChange(row1, col1, row2, col2, () => {
-        const reverse = board[row1][col1];
-        board[row1][col1] = board[row2][col2];
-        board[row2][col2] = reverse;
+      animateSwap(row1, col1, row2, col2)
+        .then(() => {
+          const reverse = board[row1][col1];
+          board[row1][col1] = board[row2][col2];
+          board[row2][col2] = reverse;
 
-        animateBoardChange(row1, col1, row2, col2, () => {
-          busy = false;
+          return animateSwap(row1, col1, row2, col2, true);
+        })
+        .then(() => {
           selected = null;
+          busy = false;
           render();
         });
-      });
 
       return;
     }
 
     moves--;
 
-    animateBoardChange(row1, col1, row2, col2, () => {
-      processMatches();
-    });
+    animateSwap(row1, col1, row2, col2)
+      .then(() => {
+        render();
+        processMatches();
+      });
   }
 
   function processMatches() {
