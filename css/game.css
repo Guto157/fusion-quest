@@ -147,12 +147,23 @@
 }
 
 .board-result {
-  margin-top: 20px;
+  position: fixed;
+  top: 75px;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 568px;
+  margin: 0;
   padding: 22px;
   border-radius: 16px;
   background: #1b2342;
   border: 1px solid #303b63;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 20;
 }
 
 .board-result h2 {
