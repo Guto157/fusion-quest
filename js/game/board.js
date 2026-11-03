@@ -17,13 +17,24 @@ export function startBoard(container, onComplete) {
     return Math.floor(Math.random() * TYPES.length);
   }
 
+  function isSpecial(piece) {
+    return piece !== null && typeof piece === "object";
+  }
+
+  function displayPiece(piece) {
+    if (piece === null) return "";
+    if (piece.type === "rocket") return "🚀";
+    if (piece.type === "rainbow") return "🌈";
+    return TYPES[piece];
+  }
+
   function createBoard() {
     board = Array.from({ length: SIZE }, () =>
       Array.from({ length: SIZE }, randomPiece)
     );
 
     while (findMatches().length > 0) {
-      removeMatches();
+      removeMatches(findMatches());
     }
 
     score = 0;
@@ -33,21 +44,45 @@ export function startBoard(container, onComplete) {
     }
   }
 
-  function findMatches() {
+  function getMatchData() {
     const matches = new Set();
+    const groups = [];
 
     for (let row = 0; row < SIZE; row++) {
       for (let col = 0; col < SIZE - 2; col++) {
         const piece = board[row][col];
 
         if (
-          piece === board[row][col + 1] &&
-          piece === board[row][col + 2]
+          typeof piece !== "number" ||
+          piece !== board[row][col + 1] ||
+          piece !== board[row][col + 2]
         ) {
-          matches.add(`${row},${col}`);
-          matches.add(`${row},${col + 1}`);
-          matches.add(`${row},${col + 2}`);
+          continue;
         }
+
+        let end = col + 2;
+
+        while (
+          end + 1 < SIZE &&
+          board[row][end + 1] === piece
+        ) {
+          end++;
+        }
+
+        const group = [];
+
+        for (let c = col; c <= end; c++) {
+          matches.add(`${row},${c}`);
+          group.push([row, c]);
+        }
+
+        groups.push({
+          positions: group,
+          length: group.length,
+          direction: "row"
+        });
+
+        col = end;
       }
     }
 
@@ -56,19 +91,49 @@ export function startBoard(container, onComplete) {
         const piece = board[row][col];
 
         if (
-          piece === board[row + 1][col] &&
-          piece === board[row + 2][col]
+          typeof piece !== "number" ||
+          piece !== board[row + 1][col] ||
+          piece !== board[row + 2][col]
         ) {
-          matches.add(`${row},${col}`);
-          matches.add(`${row + 1},${col}`);
-          matches.add(`${row + 2},${col}`);
+          continue;
         }
+
+        let end = row + 2;
+
+        while (
+          end + 1 < SIZE &&
+          board[end + 1][col] === piece
+        ) {
+          end++;
+        }
+
+        const group = [];
+
+        for (let r = row; r <= end; r++) {
+          matches.add(`${r},${col}`);
+          group.push([r, col]);
+        }
+
+        groups.push({
+          positions: group,
+          length: group.length,
+          direction: "column"
+        });
+
+        row = end;
       }
     }
 
-    return [...matches].map(position =>
-      position.split(",").map(Number)
-    );
+    return {
+      matches: [...matches].map(position =>
+        position.split(",").map(Number)
+      ),
+      groups
+    };
+  }
+
+  function findMatches() {
+    return getMatchData().matches;
   }
 
   function hasPossibleMove() {
@@ -81,6 +146,13 @@ export function startBoard(container, onComplete) {
 
         for (const [nextRow, nextCol] of neighbors) {
           if (nextRow >= SIZE || nextCol >= SIZE) continue;
+
+          if (
+            isSpecial(board[row][col]) ||
+            isSpecial(board[nextRow][nextCol])
+          ) {
+            return true;
+          }
 
           const temp = board[row][col];
           board[row][col] = board[nextRow][nextCol];
@@ -97,6 +169,37 @@ export function startBoard(container, onComplete) {
     }
 
     return false;
+  }
+
+  function compactBoard() {
+    for (let col = 0; col < SIZE; col++) {
+      let start = 0;
+
+      for (let row = 0; row <= SIZE; row++) {
+        if (
+          row === SIZE ||
+          isSpecial(board[row][col])
+        ) {
+          const remaining = [];
+
+          for (let r = row - 1; r >= start; r--) {
+            if (board[r][col] !== null) {
+              remaining.push(board[r][col]);
+            }
+          }
+
+          while (remaining.length < row - start) {
+            remaining.push(randomPiece());
+          }
+
+          for (let r = row - 1; r >= start; r--) {
+            board[r][col] = remaining[row - 1 - r];
+          }
+
+          start = row + 1;
+        }
+      }
+    }
   }
 
   function shuffleBoard() {
@@ -140,36 +243,28 @@ export function startBoard(container, onComplete) {
     message = "Tabuleiro renovado! Continue jogando.";
   }
 
-  function removeMatches() {
-    const matches = findMatches();
-
-    if (matches.length === 0) return 0;
+  function removeMatches(matches, keep = null, special = null) {
+    if (matches.length === 0) return;
 
     matches.forEach(([row, col]) => {
+      if (
+        keep &&
+        keep.row === row &&
+        keep.col === col
+      ) {
+        return;
+      }
+
       board[row][col] = null;
     });
 
     score += matches.length * 10;
 
-    for (let col = 0; col < SIZE; col++) {
-      const remaining = [];
-
-      for (let row = SIZE - 1; row >= 0; row--) {
-        if (board[row][col] !== null) {
-          remaining.push(board[row][col]);
-        }
-      }
-
-      while (remaining.length < SIZE) {
-        remaining.push(randomPiece());
-      }
-
-      for (let row = SIZE - 1; row >= 0; row--) {
-        board[row][col] = remaining[SIZE - 1 - row];
-      }
+    if (keep && special) {
+      board[keep.row][keep.col] = special;
     }
 
-    return matches.length;
+    compactBoard();
   }
 
   function render() {
@@ -203,7 +298,7 @@ export function startBoard(container, onComplete) {
               aria-label="Peça ${row + 1}, ${col + 1}"
               ${clearing.has(`${row},${col}`) ? "disabled" : ""}
             >
-              ${TYPES[piece]}
+              ${displayPiece(piece)}
             </button>
           `).join("")
         ).join("")}
@@ -309,11 +404,51 @@ export function startBoard(container, onComplete) {
   function swap(row1, col1, row2, col2) {
     if (busy) return;
 
+    const firstPiece = board[row1][col1];
+    const secondPiece = board[row2][col2];
+
+    const hasSpecial =
+      isSpecial(firstPiece) ||
+      isSpecial(secondPiece);
+
     const temp = board[row1][col1];
     board[row1][col1] = board[row2][col2];
     board[row2][col2] = temp;
 
     busy = true;
+
+    if (hasSpecial) {
+      moves--;
+
+      animateSwap(row1, col1, row2, col2)
+        .then(() => {
+          const targets = new Set();
+
+          if (isSpecial(firstPiece)) {
+            addSpecialTargets(
+              targets,
+              firstPiece,
+              row2,
+              col2,
+              secondPiece
+            );
+          }
+
+          if (isSpecial(secondPiece)) {
+            addSpecialTargets(
+              targets,
+              secondPiece,
+              row1,
+              col1,
+              firstPiece
+            );
+          }
+
+          activateTargets(targets);
+        });
+
+      return;
+    }
 
     if (findMatches().length === 0) {
       animateSwap(row1, col1, row2, col2)
@@ -339,27 +474,134 @@ export function startBoard(container, onComplete) {
     animateSwap(row1, col1, row2, col2)
       .then(() => {
         render();
-        processMatches();
+        processMatches({ row: row2, col: col2 });
       });
   }
 
-  function processMatches() {
-    const matches = findMatches();
+  function addSpecialTargets(targets, special, row, col, targetPiece) {
+    if (special.type === "rocket") {
+      if (special.direction === "row") {
+        for (let c = 0; c < SIZE; c++) {
+          targets.add(`${row},${c}`);
+        }
+      } else {
+        for (let r = 0; r < SIZE; r++) {
+          targets.add(`${r},${col}`);
+        }
+      }
+    }
+
+    if (special.type === "rainbow") {
+      const color = typeof targetPiece === "number"
+        ? targetPiece
+        : randomPiece();
+
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          if (board[r][c] === color) {
+            targets.add(`${r},${c}`);
+          }
+        }
+      }
+
+      targets.add(`${row},${col}`);
+    }
+  }
+
+  function activateTargets(targets) {
+    clearing = targets;
+    message = "BOOSTER ATIVADO!";
+    render();
+
+    setTimeout(() => {
+      let removed = 0;
+
+      targets.forEach(position => {
+        const [row, col] = position.split(",").map(Number);
+
+        if (board[row][col] !== null) {
+          board[row][col] = null;
+          removed++;
+        }
+      });
+
+      score += removed * 10;
+      clearing.clear();
+      compactBoard();
+      render();
+
+      setTimeout(() => {
+        if (findMatches().length > 0) {
+          processMatches();
+        } else {
+          finishTurn();
+        }
+      }, 180);
+    }, 600);
+  }
+
+  function processMatches(anchor = null) {
+    const data = getMatchData();
+    const matches = data.matches;
 
     if (matches.length === 0) {
       finishTurn();
       return;
     }
 
+    const specialGroup = data.groups
+      .filter(group => group.length >= 4)
+      .sort((a, b) => b.length - a.length)[0];
+
+    let keep = null;
+    let special = null;
+
+    if (specialGroup) {
+      const anchorInGroup = anchor &&
+        specialGroup.positions.some(([row, col]) =>
+          row === anchor.row && col === anchor.col
+        );
+
+      const position = anchorInGroup
+        ? [anchor.row, anchor.col]
+        : specialGroup.positions[
+            Math.floor(specialGroup.positions.length / 2)
+          ];
+
+      keep = {
+        row: position[0],
+        col: position[1]
+      };
+
+      if (specialGroup.length >= 5) {
+        special = { type: "rainbow" };
+        message = "🌈 Bomba arco-íris criada!";
+      } else {
+        special = {
+          type: "rocket",
+          direction: specialGroup.direction
+        };
+        message = "🚀 Foguete criado!";
+      }
+    } else {
+      message = "Combinação realizada!";
+    }
+
     clearing = new Set(
-      matches.map(([row, col]) => `${row},${col}`)
+      matches
+        .filter(([row, col]) =>
+          !keep ||
+          row !== keep.row ||
+          col !== keep.col
+        )
+        .map(([row, col]) => `${row},${col}`)
     );
 
     render();
 
     setTimeout(() => {
+      removeMatches(matches, keep, special);
       clearing.clear();
-      removeMatches();
       render();
 
       setTimeout(() => {
