@@ -25,7 +25,31 @@ export function startBoard(container, onComplete, stage = 1) {
   function displayPiece(piece) {
     if (piece === null) return "";
     if (piece.type === "rocket") return "🚀";
-    if (piece.type === "rainbow") return "🌈";
+    if (piece.type === "rainbow") {
+      return `
+        <svg viewBox="0 0 32 32" width="1em" height="1em"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-label="Bomba colorida"
+          style="vertical-align:middle;overflow:visible;">
+          <path d="M18 8 C20 5 23 5 24 2"
+            fill="none" stroke="#754c24" stroke-width="2.5"
+            stroke-linecap="round"/>
+          <path d="M24 2 L26 0 M24 2 L28 3 M24 2 L23 0"
+            fill="none" stroke="#ffd166" stroke-width="2"
+            stroke-linecap="round"/>
+          <path d="M16 6 A11 11 0 0 1 26 22 L16 17 Z"
+            fill="#ff4d6d" stroke="#fff" stroke-width=".7"/>
+          <path d="M16 6 A11 11 0 0 0 6 22 L16 17 Z"
+            fill="#00b4d8" stroke="#fff" stroke-width=".7"/>
+          <path d="M6 22 A11 11 0 0 0 26 22 L16 17 Z"
+            fill="#ffbe0b" stroke="#fff" stroke-width=".7"/>
+          <circle cx="16" cy="17" r="11"
+            fill="none" stroke="#fff" stroke-width="1.2"/>
+          <ellipse cx="12" cy="11" rx="3" ry="1.8"
+            fill="#fff" opacity=".65"/>
+        </svg>
+      `;
+    }
     return TYPES[piece];
   }
 
@@ -624,7 +648,7 @@ export function startBoard(container, onComplete, stage = 1) {
       };
 
       special = { type: "rainbow" };
-      message = "🌈 Bomba arco-íris criada!";
+      message = "💣 Bomba colorida criada!";
 
     } else if (specialGroup) {
       const anchorInGroup = anchor &&
