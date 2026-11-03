@@ -221,3 +221,40 @@ button {
 .avatar-choice strong{font-size:12px}
 .avatar-choice small{font-size:10px;color:#aab3d0}
 .avatar-choice.selected small{color:#67f0d0;font-weight:800}
+
+
+/* FUSION QUEST: POLIMENTO VISUAL FANTASIA 3D */
+:root{--background:#091326;--surface:#172744;--surface-light:#294263;--primary:#8b67ff;--secondary:#45f0cf;--text:#f8f7ff;--muted:#b7c5dc;--gold:#ffd77a}
+body{background:radial-gradient(ellipse at 50% -12%,#315c79 0%,transparent 42%),radial-gradient(ellipse at 5% 48%,#173b4b 0%,transparent 35%),linear-gradient(180deg,#0d1c32 0%,#0a1428 55%,#101a36 100%);background-attachment:fixed}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.2;background-image:radial-gradient(#d9f4ff 1px,transparent 1.5px);background-size:37px 37px}
+#app{padding:14px 16px 0}
+#header{min-height:72px;padding:5px 2px 12px}
+#header h2{font-size:22px!important;letter-spacing:.2px;text-shadow:0 2px 0 #111c36,0 0 18px #6ad8ff35}
+#header .muted{font-size:11px;letter-spacing:1px;text-transform:uppercase}
+#header>div>div:last-child{background:linear-gradient(145deg,#435b7c,#1b2e4b)!important;border:1px solid #7893b477;box-shadow:inset 0 1px 0 #ffffff30,0 5px 12px #030a18aa;font-weight:900}
+#screen{padding-top:10px}
+.card-panel,.avatar-panel{background:linear-gradient(145deg,#203958ed,#14233ded);border:1px solid #6b8aaa55;box-shadow:inset 0 1px 0 #ffffff12,0 10px 24px #030a1880}
+.section-title{font-size:22px;letter-spacing:.2px;text-shadow:0 2px 8px #5ddbc633}
+.nav-button{min-width:58px;padding:5px 8px;border-radius:13px;font-size:10px;transition:.2s}
+.nav-button.active{color:#8affdf;text-shadow:0 0 12px #45f0cf88}
+.nav-button.active .nav-icon{filter:drop-shadow(0 0 7px #45f0cf99);transform:translateY(-2px)}
+.nav-icon{transition:transform .2s,filter .2s}
+#navigation{background:linear-gradient(180deg,#1b3150f5,#0f1d34fa);border-top:1px solid #7190ad55;box-shadow:0 -8px 28px #02081799;backdrop-filter:blur(18px);padding:9px 8px calc(10px + env(safe-area-inset-bottom))}
+#toast{background:linear-gradient(135deg,#315879,#203b56);border:1px solid #8ac9d477;box-shadow:0 8px 24px #020817aa;font-weight:700;backdrop-filter:blur(12px)}
+.world-banner{background:linear-gradient(120deg,#174653 0%,#287d76 48%,#485b86 100%);border-color:#8be4c477;box-shadow:inset 0 1px 0 #ffffff35,0 12px 28px #02081799}
+.world-emblem{filter:drop-shadow(0 9px 4px #071323aa) drop-shadow(0 0 12px #ffe39a55)}
+.quest-map{background:radial-gradient(ellipse at 20% 18%,#4b866b88,transparent 35%),radial-gradient(ellipse at 85% 76%,#596b9b88,transparent 38%),linear-gradient(155deg,#244c5b,#315d61 45%,#283c5d);box-shadow:inset 0 0 60px #071526aa,0 12px 25px #02081788}
+.quest-map:before{background-image:radial-gradient(#f0ffe0 1px,transparent 1.5px),linear-gradient(135deg,transparent 47%,#ffffff08 48%,transparent 50%);background-size:31px 31px,100% 100%;opacity:.5}
+.quest-land{filter:blur(2px);box-shadow:inset 0 0 30px #b6ed9b22,0 0 35px #071b2866}
+.quest-route path{stroke:#f2d99b;stroke-width:10;stroke-dasharray:2 14;filter:drop-shadow(0 3px 2px #07111f) drop-shadow(0 0 5px #ffe4a055)}
+.quest-node{background:linear-gradient(145deg,#8298ae 0%,#506982 38%,#293d58 100%);border-color:#c3d9e5;box-shadow:inset 0 3px 5px #ffffff55,inset 0 -5px 8px #07132388,0 7px 0 #15283b,0 12px 17px #07111f99}
+.quest-stop.active .quest-node{background:linear-gradient(145deg,#8affdb,#27bca9 42%,#08717d);box-shadow:inset 0 3px 6px #ffffff99,inset 0 -5px 8px #07505b88,0 7px 0 #07545b,0 0 28px #31e4c477}
+.quest-stop.done .quest-node{background:linear-gradient(145deg,#fff0ad,#d9a83c 48%,#80521c);box-shadow:inset 0 3px 6px #ffffff99,inset 0 -5px 8px #67401788,0 7px 0 #65421d,0 10px 16px #07111f99}
+.quest-card{background:linear-gradient(145deg,#213c54f5,#10243af2);border-color:#a5c8d277;box-shadow:inset 0 1px 0 #ffffff22,0 7px 16px #06132388}
+.map-bottom-card{background:linear-gradient(120deg,#2d4c68,#1a2b49);border-color:#7799b466;box-shadow:inset 0 1px 0 #ffffff18,0 7px 18px #02081777}
+.map-bottom-icon{background:linear-gradient(145deg,#587c99,#294361);box-shadow:inset 0 2px 5px #ffffff33,0 4px 8px #07132388}
+.map-bottom-card button,.primary-button{background:linear-gradient(180deg,#75ffe0 0%,#29c9b6 48%,#118c91 100%);color:#07333a;text-shadow:0 1px 0 #ffffff66;box-shadow:inset 0 2px 0 #ffffff88,inset 0 -3px 0 #075c68,0 6px 12px #02081777;font-weight:900}
+.secondary-button{background:linear-gradient(180deg,#627b9e,#344b6d);border:1px solid #a7c0db66;box-shadow:inset 0 2px 0 #ffffff44,0 5px 0 #1b2b45}
+.avatar-choice{background:linear-gradient(145deg,#1b3552,#101f37);border-color:#617e9b66;box-shadow:inset 0 1px 0 #ffffff14,0 5px 12px #02081755}
+.avatar-preview{background:radial-gradient(circle at 35% 25%,#8daecb,#405b7d 55%,#243750);box-shadow:inset 0 3px 8px #ffffff55,0 5px 9px #02081788}
+.avatar-choice.selected{background:linear-gradient(145deg,#1c5960,#1b354e);border-color:#7fffe1;box-shadow:inset 0 1px 0 #ffffff55,0 0 18px #45f0cf33}
