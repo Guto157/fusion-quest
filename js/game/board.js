@@ -8,10 +8,10 @@ function getStageConfig(stage) {
   const isHard = !isInsane && stage % 10 === 0;
   const isEasy = [1, 2, 3, 6, 7, 8].includes(position);
 
-  if (isInsane) return { name: "INSANO", moves: 14, targetBonus: 80, winChance: 60 };
-  if (isHard) return { name: "DIFÍCIL", moves: 16, targetBonus: 60, winChance: 70 };
-  if (isEasy) return { name: "FÁCIL", moves: 20, targetBonus: 0, winChance: 90 };
-  return { name: "NORMAL", moves: 18, targetBonus: 40, winChance: 80 };
+  if (isInsane) return { name: "INSANO", moves: 14, targetBonus: 80, winChance: 60, obstacles: 4 };
+  if (isHard) return { name: "DIFÍCIL", moves: 16, targetBonus: 60, winChance: 70, obstacles: 2 };
+  if (isEasy) return { name: "FÁCIL", moves: 20, targetBonus: 0, winChance: 90, obstacles: 0 };
+  return { name: "NORMAL", moves: 18, targetBonus: 40, winChance: 80, obstacles: 0 };
 }
 
 export function startBoard(container, onComplete, stage = 1, onHome = () => {}) {
@@ -20,6 +20,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
   const TARGET = 250 + progressionBonus + difficulty.targetBonus;
 
   let board = [];
+  let ice = [];
   let moves = difficulty.moves;
   let score = 0;
   let dragStart = null;
@@ -70,6 +71,11 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
     board = Array.from({ length: SIZE }, () =>
       Array.from({ length: SIZE }, randomPiece)
     );
+
+    ice = Array.from({ length: SIZE }, () => Array(SIZE).fill(false));
+    const iceCount = difficulty.obstacles || 0;
+    const iceSpots = [[2, 2], [2, 4], [4, 2], [4, 4]];
+    iceSpots.slice(0, iceCount).forEach(([row, col]) => { ice[row][col] = true; });
 
     while (findMatches().length > 0) {
       removeMatches(findMatches());
@@ -337,6 +343,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       }
 
       board[row][col] = null;
+      ice[row][col] = false;
     });
 
     score += matches.length * 10;
@@ -346,6 +353,10 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
     }
 
     compactBoard();
+  }
+
+  function remainingIce() {
+    return ice.reduce((total, row) => total + row.filter(Boolean).length, 0);
   }
 
   function render() {
@@ -378,6 +389,8 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
         </div>
       </div>
 
+      ${difficulty.obstacles ? `<div class="obstacle-info">🧊 GELOS RESTANTES: <strong>${remainingIce()}</strong></div>` : ""}
+
       <div class="game-board">
         ${board.map((line, row) =>
           line.map((piece, col) => `
@@ -390,6 +403,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
               ${clearing.has(`${row},${col}`) ? "disabled" : ""}
             >
               ${displayPiece(piece)}
+              ${ice[row][col] ? '<span class="ice-overlay">🧊</span>' : ""}
             </button>
           `).join("")
         ).join("")}
@@ -653,6 +667,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
           board[row][col] = null;
           removed++;
         }
+        ice[row][col] = false;
       });
 
       score += removed * 10;
@@ -771,7 +786,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
     clearing.clear();
 
     if (
-      score < TARGET &&
+      (score < TARGET || remainingIce() > 0) &&
       moves > 0 &&
       !hasPossibleMove()
     ) {
@@ -781,7 +796,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
     busy = false;
     render();
 
-    if (score >= TARGET) {
+    if (score >= TARGET && remainingIce() === 0) {
       container.innerHTML += `
         <div class="board-result">
           <h2>🏆 FASE CONCLUÍDA!</h2>
