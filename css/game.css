@@ -47,8 +47,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s, background 0.15s;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
   padding: 0;
+  border: none;
+  cursor: pointer;
+  position: relative;
 }
 
 .game-piece:active {
@@ -59,6 +64,38 @@
   background: #6650c9;
   outline: 3px solid #20d9c2;
   transform: scale(0.92);
+  z-index: 2;
+}
+
+.game-piece.clearing {
+  animation: piece-explosion 0.35s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes piece-explosion {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: brightness(1);
+  }
+
+  25% {
+    transform: scale(1.2);
+    opacity: 1;
+    filter: brightness(2);
+  }
+
+  55% {
+    transform: scale(0.75);
+    opacity: 0.7;
+    filter: brightness(1.8);
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+    filter: brightness(2);
+  }
 }
 
 .board-message {
