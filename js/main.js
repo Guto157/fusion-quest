@@ -1,5 +1,5 @@
 
-import { startBoard } from "./game/board.js?v=stage-difficulty2";
+import { startBoard } from "./game/board.js?v=ice-obstacles1";
 
 const header = document.getElementById("header");
 const screen = document.getElementById("screen");
