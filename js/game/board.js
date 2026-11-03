@@ -11,6 +11,7 @@ export function startBoard(container, onComplete) {
   let selected = null;
   let busy = false;
   let clearing = new Set();
+  let swapping = new Map();
 
   function randomPiece() {
     return Math.floor(Math.random() * TYPES.length);
@@ -123,7 +124,8 @@ export function startBoard(container, onComplete) {
             <button
               class="game-piece
                 ${selected && selected.row === row && selected.col === col ? "selected" : ""}
-                ${clearing.has(`${row},${col}`) ? "clearing" : ""}"
+                ${clearing.has(`${row},${col}`) ? "clearing" : ""}
+                ${swapping.get(`${row},${col}`) || ""}"
               data-row="${row}"
               data-col="${col}"
               aria-label="Peça ${row + 1}, ${col + 1}"
@@ -191,7 +193,55 @@ export function startBoard(container, onComplete) {
 
     moves--;
     busy = true;
-    processMatches();
+
+    let firstDirection;
+    let secondDirection;
+
+    if (row2 > row1) {
+      firstDirection = "swap-up";
+      secondDirection = "swap-down";
+    } else if (row2 < row1) {
+      firstDirection = "swap-down";
+      secondDirection = "swap-up";
+    } else if (col2 > col1) {
+      firstDirection = "swap-left";
+      secondDirection = "swap-right";
+    } else {
+      firstDirection = "swap-right";
+      secondDirection = "swap-left";
+    }
+
+    swapping.set(
+      `${row2},${col2}`,
+      `swapping ${firstDirection}`
+    );
+
+    swapping.set(
+      `${row1},${col1}`,
+      `swapping ${secondDirection}`
+    );
+
+    render();
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        container.querySelectorAll(".game-piece.swapping").forEach(button => {
+          button.classList.remove(
+            "swapping",
+            "swap-left",
+            "swap-right",
+            "swap-up",
+            "swap-down"
+          );
+        });
+
+        swapping.clear();
+
+        setTimeout(() => {
+          processMatches();
+        }, 230);
+      });
+    });
   }
 
   function processMatches() {
