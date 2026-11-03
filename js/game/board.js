@@ -23,6 +23,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
   let ice = [];
   let moves = difficulty.moves;
   let score = 0;
+  let comboLevel = 0;
   let dragStart = null;
   let busy = false;
   let clearing = new Set();
@@ -330,6 +331,14 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
     message = "Tabuleiro renovado! Continue jogando.";
   }
 
+  function addPoints(pieceCount) {
+    const multiplier = Math.max(1, comboLevel);
+    const points = pieceCount * 10 * multiplier;
+    score += points;
+    if (multiplier > 1) message = `🔥 COMBO x${multiplier}! +${points} PONTOS`;
+    return points;
+  }
+
   function removeMatches(matches, keep = null, special = null) {
     if (matches.length === 0) return;
 
@@ -346,7 +355,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       ice[row][col] = false;
     });
 
-    score += matches.length * 10;
+    addPoints(matches.length);
 
     if (keep && special) {
       board[keep.row][keep.col] = special;
@@ -564,6 +573,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
 
     if (hasSpecial) {
       moves--;
+      comboLevel = 0;
 
       animateSwap(row1, col1, row2, col2)
         .then(() => {
@@ -595,6 +605,8 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       return;
     }
 
+    comboLevel = 0;
+
     if (findMatches().length === 0) {
       animateSwap(row1, col1, row2, col2)
         .then(() => {
@@ -617,7 +629,8 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
 
     animateSwap(row1, col1, row2, col2)
       .then(() => {
-        render();
+        // processMatches já redesenha o tabuleiro. Evita uma renderização
+        // completa extra no meio da troca, reduzindo a sensação de travada.
         processMatches({ row: row2, col: col2 });
       });
   }
@@ -653,6 +666,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
   }
 
   function activateTargets(targets) {
+    comboLevel = 1;
     clearing = targets;
     message = "BOOSTER ATIVADO!";
     render();
@@ -670,7 +684,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
         ice[row][col] = false;
       });
 
-      score += removed * 10;
+      addPoints(removed);
       clearing.clear();
       compactBoard();
       render();
@@ -694,6 +708,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       return;
     }
 
+    comboLevel++;
     const components = getMatchComponents(matches);
 
     const rainbowComponent = components
@@ -795,6 +810,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
 
     busy = false;
     render();
+    comboLevel = 0;
 
     if (score >= TARGET && remainingIce() === 0) {
       container.innerHTML += `
