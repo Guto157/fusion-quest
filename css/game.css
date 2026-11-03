@@ -175,6 +175,29 @@
   margin-bottom: 20px;
 }
 
+.board-result-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.board-result-actions .primary-button,
+.board-result-actions .secondary-button {
+  min-width: 0;
+  padding: 14px 8px;
+  font-size: 14px;
+}
+
+.secondary-button {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  color: white;
+  font-weight: bold;
+  background: #384568;
+}
+
 @media (max-width: 360px) {
   .game-board {
     gap: 3px;
