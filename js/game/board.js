@@ -393,11 +393,8 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       gameBoard.setPointerCapture(event.pointerId);
     });
 
-    gameBoard.addEventListener("pointerup", event => {
-      if (!dragStart) return;
-
-      const start = dragStart;
-      dragStart = null;
+    gameBoard.addEventListener("pointermove", event => {
+      if (!dragStart || busy) return;
 
       const element = document.elementFromPoint(event.clientX, event.clientY);
       const target = element && element.closest(".game-piece");
@@ -407,12 +404,18 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       const row = Number(target.dataset.row);
       const col = Number(target.dataset.col);
       const distance =
-        Math.abs(start.row - row) +
-        Math.abs(start.col - col);
+        Math.abs(dragStart.row - row) +
+        Math.abs(dragStart.col - col);
 
       if (distance === 1) {
+        const start = dragStart;
+        dragStart = null;
         swap(start.row, start.col, row, col);
       }
+    });
+
+    gameBoard.addEventListener("pointerup", () => {
+      dragStart = null;
     });
 
     gameBoard.addEventListener("pointercancel", () => {
@@ -536,7 +539,6 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
           return animateSwap(row1, col1, row2, col2, true);
         })
         .then(() => {
-          selected = null;
           busy = false;
           render();
         });
