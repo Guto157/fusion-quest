@@ -48,7 +48,7 @@
   align-items: center;
   justify-content: center;
   transition:
-    transform 0.15s ease,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
     background 0.15s ease;
   padding: 0;
   border: none;
@@ -67,6 +67,31 @@
   transform: scale(0.92);
   z-index: 2;
 }
+
+/* ANIMAÇÃO DE TROCA */
+
+.game-piece.swapping {
+  transition: none;
+  z-index: 4;
+}
+
+.game-piece.swapping.swap-left {
+  transform: translateX(-100%);
+}
+
+.game-piece.swapping.swap-right {
+  transform: translateX(100%);
+}
+
+.game-piece.swapping.swap-up {
+  transform: translateY(-100%);
+}
+
+.game-piece.swapping.swap-down {
+  transform: translateY(100%);
+}
+
+/* ANIMAÇÃO DE EXPLOSÃO */
 
 .game-piece.clearing {
   z-index: 5;
