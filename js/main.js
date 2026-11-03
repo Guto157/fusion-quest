@@ -148,9 +148,14 @@ function renderGame() {
 
     const cardReward = grantCard();
 
-    if (player.xp >= 100) {
+    let leveledUp = false;
+    while (player.xp >= 100) {
       player.xp -= 100;
       player.level++;
+      leveledUp = true;
+    }
+
+    if (leveledUp) {
       showToast("🎉 Você subiu de nível!");
     }
 
