@@ -236,3 +236,5 @@
     border-radius: 6px;
   }
 }
+
+.obstacle-info{margin:-8px 2px 12px;text-align:right;color:#b9dff5;font-size:11px;letter-spacing:.3px}.obstacle-info strong{color:#fff;font-size:13px}.game-piece .ice-overlay{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:flex-end;padding:1px;border:2px solid rgba(160,225,255,.9);border-radius:9px;background:rgba(125,211,252,.20);box-shadow:inset 0 0 8px rgba(186,230,253,.65);font-size:clamp(9px,2.7vw,14px);line-height:1;pointer-events:none;z-index:1}
