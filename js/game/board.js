@@ -1,13 +1,26 @@
 
 const SIZE = 7;
 const TYPES = ["💎", "🔵", "🟣", "🟢", "🟡", "🔴"];
-const MAX_MOVES = 20;
+
+function getStageConfig(stage) {
+  const position = ((stage - 1) % 10) + 1;
+  const isInsane = stage % 50 === 0;
+  const isHard = !isInsane && stage % 10 === 0;
+  const isEasy = [1, 2, 3, 6, 7, 8].includes(position);
+
+  if (isInsane) return { name: "INSANO", moves: 14, targetBonus: 150, winChance: 60 };
+  if (isHard) return { name: "DIFÍCIL", moves: 16, targetBonus: 100, winChance: 70 };
+  if (isEasy) return { name: "FÁCIL", moves: 20, targetBonus: 0, winChance: 90 };
+  return { name: "NORMAL", moves: 18, targetBonus: 50, winChance: 80 };
+}
 
 export function startBoard(container, onComplete, stage = 1, onHome = () => {}) {
-  const TARGET = 250 + (stage - 1) * 50;
+  const difficulty = getStageConfig(stage);
+  const progressionBonus = Math.floor((stage - 1) / 10) * 50;
+  const TARGET = 250 + progressionBonus + difficulty.targetBonus;
 
   let board = [];
-  let moves = MAX_MOVES;
+  let moves = difficulty.moves;
   let score = 0;
   let dragStart = null;
   let busy = false;
@@ -337,6 +350,17 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
 
   function render() {
     container.innerHTML = `
+      <div class="stage-difficulty">
+        <div>
+          <strong>FASE ${stage}</strong>
+          <span class="difficulty-name difficulty-${difficulty.name.toLowerCase()}">${difficulty.name}</span>
+        </div>
+        <div class="win-chance" aria-label="Chance estimada de vitória: ${difficulty.winChance}%">
+          <span>CHANCE DE VITÓRIA</span>
+          <strong>${difficulty.winChance}%</strong>
+        </div>
+      </div>
+
       <div class="board-info">
         <div class="board-stat">
           <span>PONTOS</span>
