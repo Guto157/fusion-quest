@@ -8,7 +8,8 @@ const navigation = document.getElementById("navigation");
 const player = {
   coins: Number(localStorage.getItem("fq_coins")) || 500,
   level: Number(localStorage.getItem("fq_level")) || 1,
-  xp: Number(localStorage.getItem("fq_xp")) || 0
+  xp: Number(localStorage.getItem("fq_xp")) || 0,
+  stage: Number(localStorage.getItem("fq_stage")) || 1
 };
 
 let currentScreen = "home";
@@ -25,6 +26,7 @@ function savePlayer() {
   localStorage.setItem("fq_coins", player.coins);
   localStorage.setItem("fq_level", player.level);
   localStorage.setItem("fq_xp", player.xp);
+  localStorage.setItem("fq_stage", player.stage);
 }
 
 function renderHeader() {
@@ -94,7 +96,7 @@ function renderHome() {
 
 function renderGame() {
   screen.innerHTML = `
-    <h2 class="section-title">🎮 Fase ${player.level}</h2>
+    <h2 class="section-title">🎮 Fase ${player.stage}</h2>
     <div id="board-container"></div>
   `;
 
@@ -106,6 +108,7 @@ function renderGame() {
 
     player.coins += earnedCoins;
     player.xp += earnedXP;
+    player.stage++;
 
     if (player.xp >= 100) {
       player.xp -= 100;
@@ -132,7 +135,7 @@ function renderGame() {
       navigate("home");
       showToast("Recompensas adicionadas!");
     });
-  });
+  }, player.stage);
 }
 
 function renderCollection() {
