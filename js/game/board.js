@@ -418,6 +418,14 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
         ).join("")}
       </div>
 
+      ${comboLevel >= 2 ? `
+        <div class="combo-celebration combo-level-${Math.min(comboLevel, 5)}" aria-live="polite">
+          <span class="combo-spark">✦</span>
+          <strong>${comboLevel >= 5 ? "COMBO LENDÁRIO!" : comboLevel === 4 ? "COMBO ÉPICO!" : comboLevel === 3 ? "SUPER COMBO!" : "COMBO!"}</strong>
+          <b>x${comboLevel}</b>
+          <small>MAIS PONTOS!</small>
+        </div>
+      ` : ""}
       <p class="board-message">
         ${message}
       </p>
