@@ -11,7 +11,6 @@ export function startBoard(container, onComplete) {
   let selected = null;
   let busy = false;
   let clearing = new Set();
-  let swapping = new Map();
 
   function randomPiece() {
     return Math.floor(Math.random() * TYPES.length);
@@ -124,8 +123,7 @@ export function startBoard(container, onComplete) {
             <button
               class="game-piece
                 ${selected && selected.row === row && selected.col === col ? "selected" : ""}
-                ${clearing.has(`${row},${col}`) ? "clearing" : ""}
-                ${swapping.get(`${row},${col}`) || ""}"
+                ${clearing.has(`${row},${col}`) ? "clearing" : ""}"
               data-row="${row}"
               data-col="${col}"
               aria-label="Peça ${row + 1}, ${col + 1}"
@@ -150,6 +148,58 @@ export function startBoard(container, onComplete) {
         );
       });
     });
+  }
+
+  function animateBoardChange(row1, col1, row2, col2, callback) {
+    const firstOld = container.querySelector(
+      `[data-row="${row1}"][data-col="${col1}"]`
+    );
+
+    const secondOld = container.querySelector(
+      `[data-row="${row2}"][data-col="${col2}"]`
+    );
+
+    const firstRect = firstOld.getBoundingClientRect();
+    const secondRect = secondOld.getBoundingClientRect();
+
+    render();
+
+    const firstNew = container.querySelector(
+      `[data-row="${row1}"][data-col="${col1}"]`
+    );
+
+    const secondNew = container.querySelector(
+      `[data-row="${row2}"][data-col="${col2}"]`
+    );
+
+    firstNew.style.transition = "none";
+    secondNew.style.transition = "none";
+
+    firstNew.style.transform =
+      `translate(${secondRect.left - firstRect.left}px, ${secondRect.top - firstRect.top}px)`;
+
+    secondNew.style.transform =
+      `translate(${firstRect.left - secondRect.left}px, ${firstRect.top - secondRect.top}px)`;
+
+    firstNew.offsetWidth;
+
+    firstNew.style.transition =
+      "transform 230ms cubic-bezier(0.22, 1, 0.36, 1)";
+
+    secondNew.style.transition =
+      "transform 230ms cubic-bezier(0.22, 1, 0.36, 1)";
+
+    firstNew.style.transform = "translate(0, 0)";
+    secondNew.style.transform = "translate(0, 0)";
+
+    setTimeout(() => {
+      firstNew.style.transition = "";
+      secondNew.style.transition = "";
+      firstNew.style.transform = "";
+      secondNew.style.transform = "";
+
+      callback();
+    }, 250);
   }
 
   function handleSelection(row, col) {
@@ -182,65 +232,28 @@ export function startBoard(container, onComplete) {
     board[row1][col1] = board[row2][col2];
     board[row2][col2] = temp;
 
-    if (findMatches().length === 0) {
-      const reverse = board[row1][col1];
-      board[row1][col1] = board[row2][col2];
-      board[row2][col2] = reverse;
+    busy = true;
 
-      render();
+    if (findMatches().length === 0) {
+      animateBoardChange(row1, col1, row2, col2, () => {
+        const reverse = board[row1][col1];
+        board[row1][col1] = board[row2][col2];
+        board[row2][col2] = reverse;
+
+        animateBoardChange(row1, col1, row2, col2, () => {
+          busy = false;
+          selected = null;
+          render();
+        });
+      });
+
       return;
     }
 
     moves--;
-    busy = true;
 
-    let firstDirection;
-    let secondDirection;
-
-    if (row2 > row1) {
-      firstDirection = "swap-up";
-      secondDirection = "swap-down";
-    } else if (row2 < row1) {
-      firstDirection = "swap-down";
-      secondDirection = "swap-up";
-    } else if (col2 > col1) {
-      firstDirection = "swap-left";
-      secondDirection = "swap-right";
-    } else {
-      firstDirection = "swap-right";
-      secondDirection = "swap-left";
-    }
-
-    swapping.set(
-      `${row2},${col2}`,
-      `swapping ${firstDirection}`
-    );
-
-    swapping.set(
-      `${row1},${col1}`,
-      `swapping ${secondDirection}`
-    );
-
-    render();
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        container.querySelectorAll(".game-piece.swapping").forEach(button => {
-          button.classList.remove(
-            "swapping",
-            "swap-left",
-            "swap-right",
-            "swap-up",
-            "swap-down"
-          );
-        });
-
-        swapping.clear();
-
-        setTimeout(() => {
-          processMatches();
-        }, 230);
-      });
+    animateBoardChange(row1, col1, row2, col2, () => {
+      processMatches();
     });
   }
 
