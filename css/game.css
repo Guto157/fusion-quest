@@ -287,3 +287,23 @@
 @keyframes combo-glow{from{filter:brightness(1);box-shadow:0 0 0 3px #ffd16622,0 7px 22px #0008,0 0 16px #ffbd4a66}to{filter:brightness(1.2);box-shadow:0 0 0 4px #ffd16644,0 7px 24px #0008,0 0 30px #ffbd4acc}}
 @keyframes combo-sparkle{from{transform:scale(.75) rotate(-18deg);opacity:.65}to{transform:scale(1.25) rotate(18deg);opacity:1}}
 @media(prefers-reduced-motion:reduce){.combo-celebration,.combo-spark{animation:none}}
+
+
+/* COMBO SOBRE O TABULEIRO, SEM BLOQUEAR TOQUES */
+.game-board{position:relative}
+.game-board .combo-celebration{
+  position:absolute;
+  left:50%;
+  top:50%;
+  z-index:20;
+  margin:0;
+  pointer-events:none;
+  max-width:calc(100% - 16px);
+  white-space:nowrap;
+  padding:10px 12px;
+}
+@keyframes combo-pop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(-7deg)}
+  65%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(2deg)}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}
+}
