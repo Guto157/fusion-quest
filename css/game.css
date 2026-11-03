@@ -1,3 +1,26 @@
+.stage-difficulty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 9px 12px;
+  background: #1b2342;
+  border: 1px solid #303b63;
+  border-radius: 12px;
+}
+
+.stage-difficulty > div:first-child { display: flex; align-items: center; gap: 8px; }
+.stage-difficulty > div:first-child strong { font-size: 13px; }
+.difficulty-name { font-size: 10px; font-weight: 800; letter-spacing: .4px; padding: 4px 7px; border-radius: 6px; }
+.difficulty-fácil { color: #4ade80; background: #16452f; }
+.difficulty-normal { color: #60a5fa; background: #183b60; }
+.difficulty-difícil { color: #fbbf24; background: #514018; }
+.difficulty-insano { color: #fb7185; background: #511f32; }
+.win-chance { display: flex; align-items: flex-end; flex-direction: column; gap: 2px; }
+.win-chance span { color: #aab3d0; font-size: 8px; letter-spacing: .35px; }
+.win-chance strong { color: #4ade80; font-size: 14px; line-height: 1; }
+
 
 .board-info {
   display: grid;
