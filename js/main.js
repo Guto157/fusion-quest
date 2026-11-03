@@ -15,6 +15,20 @@ const player = {
 let currentScreen = "home";
 let selectedStage = player.stage;
 
+const AVATARS = [
+  { id: "homem", name: "Aventureiro", emoji: "👨🏻" },
+  { id: "mulher", name: "Aventureira", emoji: "👩🏻" },
+  { id: "menino", name: "Jovem aventureiro", emoji: "👦🏻" },
+  { id: "menina", name: "Jovem aventureira", emoji: "👧🏻" }
+];
+
+let selectedAvatar = localStorage.getItem("fq_avatar") || "homem";
+if (!AVATARS.some(avatar => avatar.id === selectedAvatar)) selectedAvatar = "homem";
+
+function getSelectedAvatar() {
+  return AVATARS.find(avatar => avatar.id === selectedAvatar) || AVATARS[0];
+}
+
 const CARD_CATALOG = [
   { id: "gema-azul", name: "Gema Azul", emoji: "🔵", rarity: "Comum", description: "Uma peça clássica do tabuleiro." },
   { id: "gema-verde", name: "Gema Verde", emoji: "🟢", rarity: "Comum", description: "Energia verde para suas combinações." },
@@ -122,7 +136,7 @@ function renderHome() {
     const isCurrent = stage === player.stage;
     const isLocked = stage > player.stage;
     const stars = "★".repeat(info.stars) + "☆".repeat(5 - info.stars);
-    const icon = isLocked ? "🔒" : isCurrent ? "🧙" : "🏆";
+    const icon = isLocked ? "🔒" : isCurrent ? getSelectedAvatar().emoji : "🏆";
     return `
       <div class="quest-stop stop-${index} ${isCompleted ? "done" : ""} ${isCurrent ? "active" : ""} ${isLocked ? "locked" : ""}">
         <button class="quest-node" data-stage="${stage}" ${isLocked ? "disabled" : ""} aria-label="Fase ${stage}">
@@ -259,13 +273,35 @@ function renderRewards() {
 }
 
 function renderSettings() {
+  const avatarCards = AVATARS.map(avatar => `
+    <button class="avatar-choice ${selectedAvatar === avatar.id ? "selected" : ""}" data-avatar="${avatar.id}" aria-pressed="${selectedAvatar === avatar.id}">
+      <span class="avatar-preview">${avatar.emoji}</span>
+      <strong>${avatar.name}</strong>
+      <small>${selectedAvatar === avatar.id ? "Selecionado" : "Escolher"}</small>
+    </button>
+  `).join("");
+
   screen.innerHTML = `
     <h2 class="section-title">⚙️ Ajustes</h2>
+    <section class="avatar-panel">
+      <div class="avatar-panel-heading">
+        <div><h3>Escolha seu aventureiro</h3><p>Seu personagem aparecerá no mapa das fases.</p></div>
+        <span class="avatar-heading-icon">${getSelectedAvatar().emoji}</span>
+      </div>
+      <div class="avatar-grid">${avatarCards}</div>
+    </section>
     <div class="card-panel">
       <h3 style="margin-bottom:12px;">Configurações</h3>
-      <p class="muted">As opções de som, música e preferências serão adicionadas aqui.</p>
+      <p class="muted">Mais opções de som, música e preferências serão adicionadas aqui.</p>
     </div>
   `;
+
+  screen.querySelectorAll("[data-avatar]").forEach(button => button.addEventListener("click", () => {
+    selectedAvatar = button.dataset.avatar;
+    localStorage.setItem("fq_avatar", selectedAvatar);
+    renderSettings();
+    showToast("Avatar atualizado!");
+  }));
 }
 
 function navigate(destination) {
