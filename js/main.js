@@ -1,5 +1,5 @@
 
-import { startBoard } from "./game/board.js?v=combo-system1";
+import { startBoard } from "./game/board.js?v=combo-animation1";
 
 const header = document.getElementById("header");
 const screen = document.getElementById("screen");
