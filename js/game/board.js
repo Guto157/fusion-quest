@@ -817,7 +817,8 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       });
 
       container.querySelector("#home-level").addEventListener("click", () => {
-        onHome();
+        // A vitória já foi confirmada: INÍCIO também registra a fase concluída.
+        onComplete(score);
       });
 
     } else if (moves <= 0) {
