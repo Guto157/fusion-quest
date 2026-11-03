@@ -8,15 +8,15 @@ function getStageConfig(stage) {
   const isHard = !isInsane && stage % 10 === 0;
   const isEasy = [1, 2, 3, 6, 7, 8].includes(position);
 
-  if (isInsane) return { name: "INSANO", moves: 14, targetBonus: 150, winChance: 60 };
-  if (isHard) return { name: "DIFÍCIL", moves: 16, targetBonus: 100, winChance: 70 };
+  if (isInsane) return { name: "INSANO", moves: 14, targetBonus: 80, winChance: 60 };
+  if (isHard) return { name: "DIFÍCIL", moves: 16, targetBonus: 60, winChance: 70 };
   if (isEasy) return { name: "FÁCIL", moves: 20, targetBonus: 0, winChance: 90 };
-  return { name: "NORMAL", moves: 18, targetBonus: 50, winChance: 80 };
+  return { name: "NORMAL", moves: 18, targetBonus: 40, winChance: 80 };
 }
 
 export function startBoard(container, onComplete, stage = 1, onHome = () => {}) {
   const difficulty = getStageConfig(stage);
-  const progressionBonus = Math.floor((stage - 1) / 10) * 50;
+  const progressionBonus = Math.floor((stage - 1) / 10) * 100;
   const TARGET = 250 + progressionBonus + difficulty.targetBonus;
 
   let board = [];
@@ -356,7 +356,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
           <span class="difficulty-name difficulty-${difficulty.name.toLowerCase()}">${difficulty.name}</span>
         </div>
         <div class="win-chance" aria-label="Chance estimada de vitória: ${difficulty.winChance}%">
-          <span>CHANCE DE VITÓRIA</span>
+          <span>CHANCE ESTIMADA</span>
           <strong>${difficulty.winChance}%</strong>
         </div>
       </div>
