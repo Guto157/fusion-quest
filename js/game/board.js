@@ -23,6 +23,8 @@ export function startBoard(container, onComplete) {
     while (findMatches().length > 0) {
       removeMatches();
     }
+
+        score = 0;
   }
 
   function findMatches() {
