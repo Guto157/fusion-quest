@@ -15,14 +15,14 @@ const player = {
 let currentScreen = "home";
 
 const CARD_CATALOG = [
-  { id: "cristal-guardiao", name: "Guardião Cristal", emoji: "💎", rarity: "Comum" },
-  { id: "lobo-flamejante", name: "Lobo Flamejante", emoji: "🐺", rarity: "Comum" },
-  { id: "raposa-lunar", name: "Raposa Lunar", emoji: "🦊", rarity: "Comum" },
-  { id: "dragao-marinho", name: "Dragão Marinho", emoji: "🐉", rarity: "Rara" },
-  { id: "feiticeira-estelar", name: "Feiticeira Estelar", emoji: "🧙", rarity: "Rara" },
-  { id: "fenix-ancestral", name: "Fênix Ancestral", emoji: "🔥", rarity: "Épica" },
-  { id: "guardiao-celeste", name: "Guardião Celeste", emoji: "🪽", rarity: "Épica" },
-  { id: "rei-do-cosmos", name: "Rei do Cosmos", emoji: "👑", rarity: "Lendária" }
+  { id: "gema-azul", name: "Gema Azul", emoji: "🔵", rarity: "Comum", description: "Uma peça clássica do tabuleiro." },
+  { id: "gema-verde", name: "Gema Verde", emoji: "🟢", rarity: "Comum", description: "Energia verde para suas combinações." },
+  { id: "gema-amarela", name: "Gema Dourada", emoji: "🟡", rarity: "Comum", description: "Brilha a cada combinação." },
+  { id: "gema-vermelha", name: "Gema Rubi", emoji: "🔴", rarity: "Rara", description: "Uma joia de grande valor." },
+  { id: "gema-roxa", name: "Gema Violeta", emoji: "🟣", rarity: "Rara", description: "Uma peça rara do tabuleiro." },
+  { id: "gema-diamante", name: "Diamante Supremo", emoji: "💎", rarity: "Épica", description: "A joia mais preciosa do Fusion Quest." },
+  { id: "foguete", name: "Foguete Explosivo", emoji: "🚀", rarity: "Épica", description: "Limpa uma linha ou coluna inteira." },
+  { id: "bomba-colorida", name: "Bomba Colorida", emoji: "💣", rarity: "Lendária", description: "Elimina todas as peças de uma cor." }
 ];
 
 let ownedCards = [];
@@ -35,7 +35,10 @@ try {
 }
 
 function grantCard() {
-  const card = CARD_CATALOG.find(item => !ownedCards.includes(item.id));
+  const availableCards = CARD_CATALOG.filter(item => !ownedCards.includes(item.id));
+  const card = availableCards.length
+    ? availableCards[Math.floor(Math.random() * availableCards.length)]
+    : null;
 
   if (!card) {
     player.coins += 50;
@@ -162,7 +165,7 @@ function renderGame() {
         <p style="margin-top:8px;color:#20d9c2;">⭐ +${earnedXP} XP</p>
         ${cardReward.duplicate
           ? `<div style="margin-top:18px;padding:14px;background:#28345c;border-radius:14px;"><div style="font-size:30px;">🪙</div><strong>Coleção completa!</strong><p class="muted" style="margin-top:5px;">+${cardReward.coins} moedas por repetição.</p></div>`
-          : `<div style="margin-top:18px;padding:14px;background:#28345c;border-radius:14px;"><div style="font-size:42px;">${cardReward.card.emoji}</div><strong>Nova carta desbloqueada!</strong><p style="margin-top:5px;">${cardReward.card.name}</p><p class="muted" style="margin-top:3px;">Raridade ${cardReward.card.rarity}</p></div>`}
+          : `<div style="margin-top:18px;padding:16px;background:#28345c;border:1px solid #ffd166;border-radius:14px;"><div style="font-size:46px;">${cardReward.card.emoji}</div><strong style="display:block;margin-top:6px;">🃏 NOVA CARTA!</strong><p style="font-size:17px;font-weight:bold;margin-top:5px;">${cardReward.card.name}</p><p class="muted" style="margin-top:4px;">${cardReward.card.description}</p><p style="margin-top:7px;color:#ffd166;font-size:12px;">RARIDADE ${cardReward.card.rarity.toUpperCase()}</p></div>`}
         <button class="primary-button" id="home-button" style="margin-top:25px;">
           CONTINUAR
         </button>
@@ -182,10 +185,11 @@ function renderCollection() {
   const cardsHTML = CARD_CATALOG.map(card => {
     const unlocked = ownedCards.includes(card.id);
     const color = rarityColors[card.rarity];
-    return '<div style="background:#1b2342;border:1px solid ' + (unlocked ? color : "#303b63") + ';border-radius:16px;padding:16px 10px;text-align:center;min-height:166px;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
+    return '<div style="background:#1b2342;border:1px solid ' + (unlocked ? color : "#303b63") + ';border-radius:16px;padding:16px 10px;text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
       '<div style="font-size:43px;filter:' + (unlocked ? "none" : "grayscale(1)") + ';opacity:' + (unlocked ? "1" : ".35") + ';">' + (unlocked ? card.emoji : "❔") + '</div>' +
       '<strong style="font-size:14px;margin-top:9px;">' + (unlocked ? card.name : "Carta bloqueada") + '</strong>' +
-      '<span style="font-size:11px;color:' + (unlocked ? color : "#aab3d0") + ';margin-top:6px;">' + (unlocked ? card.rarity : "Não descoberta") + '</span></div>';
+      '<span style="font-size:11px;color:' + (unlocked ? color : "#aab3d0") + ';margin-top:6px;">' + (unlocked ? card.rarity : "Não descoberta") + '</span>' +
+      (unlocked ? '<span style="font-size:11px;color:#aab3d0;margin-top:7px;">' + card.description + '</span>' : '') + '</div>';
   }).join("");
   screen.innerHTML = '<h2 class="section-title">🃏 Coleção de cartas</h2>' +
     '<div class="card-panel"><div style="display:flex;justify-content:space-between;"><strong>Cartas desbloqueadas</strong><strong style="color:#20d9c2;">' + unlockedCount + '/' + CARD_CATALOG.length + '</strong></div>' +
