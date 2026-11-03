@@ -238,3 +238,20 @@
 }
 
 .obstacle-info{margin:-8px 2px 12px;text-align:right;color:#b9dff5;font-size:11px;letter-spacing:.3px}.obstacle-info strong{color:#fff;font-size:13px}.game-piece .ice-overlay{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:flex-end;padding:1px;border:2px solid rgba(160,225,255,.9);border-radius:9px;background:rgba(125,211,252,.20);box-shadow:inset 0 0 8px rgba(186,230,253,.65);font-size:clamp(9px,2.7vw,14px);line-height:1;pointer-events:none;z-index:1}
+
+
+/* TABULEIRO E INTERFACE: ACABAMENTO 3D */
+.stage-difficulty{background:linear-gradient(145deg,#294565,#172943);border-color:#7395b366;box-shadow:inset 0 1px 0 #ffffff22,0 5px 13px #02081777}
+.board-stat{background:linear-gradient(155deg,#294563,#172943);border-color:#6e8ba866;box-shadow:inset 0 2px 0 #ffffff18,0 5px 12px #02081766}
+.board-stat span{color:#c0d4e7;letter-spacing:.6px;font-weight:800}
+.board-stat strong{text-shadow:0 2px 8px #6eead455}
+.game-board{gap:5px;padding:9px;border-radius:20px;background:linear-gradient(145deg,#6e8ba0 0%,#314d6b 12%,#172943 55%,#0c1b31 100%);border:2px solid #8eb5c577;box-shadow:inset 0 3px 8px #ffffff35,inset 0 -8px 14px #061323aa,0 12px 24px #020817aa}
+.game-piece{border-radius:11px;background:linear-gradient(145deg,#526f91 0%,#2b4567 48%,#1b2d4b 100%);border:1px solid #91b4d044;box-shadow:inset 0 2px 3px #ffffff35,inset 0 -4px 6px #08162a99,0 3px 5px #07132388;text-shadow:0 2px 3px #07132388;filter:drop-shadow(0 1px 1px #061323)}
+.game-piece:active{filter:brightness(1.25) drop-shadow(0 2px 3px #061323)}
+.game-piece.selected{background:linear-gradient(145deg,#9c8aff,#5945bd 55%,#392c86);outline:2px solid #75ffe0;box-shadow:inset 0 2px 5px #ffffff66,0 0 0 4px #45f0cf33,0 0 18px #45f0cf88}
+.game-piece .ice-overlay{background:linear-gradient(145deg,#c5f3ff77,#5eb9e855);border:2px solid #c9f5ff;box-shadow:inset 0 2px 5px #ffffff99,0 0 12px #7dd3fc88}
+.obstacle-info{color:#d5efff;text-shadow:0 1px 5px #4aa8dd66}
+.board-message{color:#d2e4f5;text-shadow:0 1px 5px #071323}
+.board-result{background:radial-gradient(ellipse at 50% 0%,#3a6385,#1b3552 55%,#101f37);border:1px solid #a1c6df88;box-shadow:inset 0 2px 0 #ffffff33,0 18px 50px #000c;backdrop-filter:blur(14px);border-radius:24px}
+.board-result h2{font-size:23px;text-shadow:0 3px 12px #ffd16644}
+.board-result p{color:#d0e0f1}
