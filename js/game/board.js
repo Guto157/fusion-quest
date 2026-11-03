@@ -1,10 +1,11 @@
 
 const SIZE = 7;
 const TYPES = ["💎", "🔵", "🟣", "🟢", "🟡", "🔴"];
-const TARGET = 25;
 const MAX_MOVES = 20;
 
-export function startBoard(container, onComplete) {
+export function startBoard(container, onComplete, stage = 1) {
+  const TARGET = 250 + (stage - 1) * 50;
+
   let board = [];
   let moves = MAX_MOVES;
   let score = 0;
@@ -130,6 +131,49 @@ export function startBoard(container, onComplete) {
       ),
       groups
     };
+  }
+
+  function getMatchComponents(matches) {
+    const remaining = new Set(
+      matches.map(([row, col]) => `${row},${col}`)
+    );
+
+    const components = [];
+
+    while (remaining.size > 0) {
+      const first = remaining.values().next().value;
+      const [startRow, startCol] = first.split(",").map(Number);
+
+      const component = [];
+      const queue = [[startRow, startCol]];
+
+      remaining.delete(first);
+
+      while (queue.length > 0) {
+        const [row, col] = queue.shift();
+        component.push([row, col]);
+
+        const neighbors = [
+          [row - 1, col],
+          [row + 1, col],
+          [row, col - 1],
+          [row, col + 1]
+        ];
+
+        for (const [nextRow, nextCol] of neighbors) {
+          const key = `${nextRow},${nextCol}`;
+
+          if (remaining.has(key)) {
+            remaining.delete(key);
+            queue.push([nextRow, nextCol]);
+          }
+        }
+      }
+
+      components.push(component);
+    }
+
+    return components;
   }
 
   function findMatches() {
@@ -282,7 +326,7 @@ export function startBoard(container, onComplete) {
 
         <div class="board-stat">
           <span>META</span>
-          <strong>${TARGET * 10}</strong>
+          <strong>${TARGET}</strong>
         </div>
       </div>
 
@@ -377,7 +421,7 @@ export function startBoard(container, onComplete) {
   }
 
   function handleSelection(row, col) {
-    if (busy || moves <= 0 || score >= TARGET * 10) return;
+    if (busy || moves <= 0 || score >= TARGET) return;
 
     if (!selected) {
       selected = { row, col };
@@ -549,6 +593,12 @@ export function startBoard(container, onComplete) {
       return;
     }
 
+    const components = getMatchComponents(matches);
+
+    const rainbowComponent = components
+      .filter(component => component.length >= 5)
+      .sort((a, b) => b.length - a.length)[0];
+
     const specialGroup = data.groups
       .filter(group => group.length >= 4)
       .sort((a, b) => b.length - a.length)[0];
@@ -556,7 +606,27 @@ export function startBoard(container, onComplete) {
     let keep = null;
     let special = null;
 
-    if (specialGroup) {
+    if (rainbowComponent) {
+      const anchorInComponent = anchor &&
+        rainbowComponent.some(([row, col]) =>
+          row === anchor.row && col === anchor.col
+        );
+
+      const position = anchorInComponent
+        ? [anchor.row, anchor.col]
+        : rainbowComponent[
+            Math.floor(rainbowComponent.length / 2)
+          ];
+
+      keep = {
+        row: position[0],
+        col: position[1]
+      };
+
+      special = { type: "rainbow" };
+      message = "🌈 Bomba arco-íris criada!";
+
+    } else if (specialGroup) {
       const anchorInGroup = anchor &&
         specialGroup.positions.some(([row, col]) =>
           row === anchor.row && col === anchor.col
@@ -573,16 +643,13 @@ export function startBoard(container, onComplete) {
         col: position[1]
       };
 
-      if (specialGroup.length >= 5) {
-        special = { type: "rainbow" };
-        message = "🌈 Bomba arco-íris criada!";
-      } else {
-        special = {
-          type: "rocket",
-          direction: specialGroup.direction
-        };
-        message = "🚀 Foguete criado!";
-      }
+      special = {
+        type: "rocket",
+        direction: specialGroup.direction
+      };
+
+      message = "🚀 Foguete criado!";
+
     } else {
       message = "Combinação realizada!";
     }
@@ -618,7 +685,7 @@ export function startBoard(container, onComplete) {
     clearing.clear();
 
     if (
-      score < TARGET * 10 &&
+      score < TARGET &&
       moves > 0 &&
       !hasPossibleMove()
     ) {
@@ -628,7 +695,7 @@ export function startBoard(container, onComplete) {
     busy = false;
     render();
 
-    if (score >= TARGET * 10) {
+    if (score >= TARGET) {
       container.innerHTML += `
         <div class="board-result">
           <h2>🏆 FASE CONCLUÍDA!</h2>
@@ -655,7 +722,7 @@ export function startBoard(container, onComplete) {
       `;
 
       container.querySelector("#retry-level").addEventListener("click", () => {
-        startBoard(container, onComplete);
+        startBoard(container, onComplete, stage);
       });
     }
   }
