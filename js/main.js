@@ -156,27 +156,16 @@ function renderGame() {
 
     savePlayer();
 
-    screen.innerHTML = `
-      <div class="card-panel" style="text-align:center;padding:30px 18px;">
-        <div style="font-size:65px;">🏆</div>
-        <h2 style="margin:15px 0;">Fase concluída!</h2>
-        <p class="muted">Pontuação: ${score}</p>
-        <p style="margin-top:15px;color:#ffd166;">🪙 +${earnedCoins} moedas</p>
-        <p style="margin-top:8px;color:#20d9c2;">⭐ +${earnedXP} XP</p>
-        ${cardReward.duplicate
-          ? `<div style="margin-top:18px;padding:14px;background:#28345c;border-radius:14px;"><div style="font-size:30px;">🪙</div><strong>Coleção completa!</strong><p class="muted" style="margin-top:5px;">+${cardReward.coins} moedas por repetição.</p></div>`
-          : `<div style="margin-top:18px;padding:16px;background:#28345c;border:1px solid #ffd166;border-radius:14px;"><div style="font-size:46px;">${cardReward.card.emoji}</div><strong style="display:block;margin-top:6px;">🃏 NOVA CARTA!</strong><p style="font-size:17px;font-weight:bold;margin-top:5px;">${cardReward.card.name}</p><p class="muted" style="margin-top:4px;">${cardReward.card.description}</p><p style="margin-top:7px;color:#ffd166;font-size:12px;">RARIDADE ${cardReward.card.rarity.toUpperCase()}</p></div>`}
-        <button class="primary-button" id="home-button" style="margin-top:25px;">
-          CONTINUAR
-        </button>
-      </div>
-    `;
+    navigate("game");
 
-    document.getElementById("home-button").addEventListener("click", () => {
-      navigate("home");
-      showToast("Recompensas adicionadas!");
-    });
-  }, player.stage);
+    if (cardReward.duplicate) {
+      showToast("Fase concluída! +" + earnedCoins + " moedas e coleção completa.");
+    } else {
+      showToast("Nova carta: " + cardReward.card.name + "! Recompensas adicionadas.");
+    }
+  }, player.stage, () => {
+    navigate("home");
+  });
 }
 
 function renderCollection() {
