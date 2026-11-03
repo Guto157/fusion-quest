@@ -387,40 +387,65 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       event.preventDefault();
       dragStart = {
         row: Number(piece.dataset.row),
-        col: Number(piece.dataset.col)
+        col: Number(piece.dataset.col),
+        x: event.clientX,
+        y: event.clientY,
+        element: piece
       };
 
+      piece.style.transition = "none";
+      piece.style.zIndex = "10";
+      piece.style.filter = "brightness(1.25)";
       gameBoard.setPointerCapture(event.pointerId);
     });
 
     gameBoard.addEventListener("pointermove", event => {
       if (!dragStart || busy) return;
 
-      const element = document.elementFromPoint(event.clientX, event.clientY);
-      const target = element && element.closest(".game-piece");
+      const dx = event.clientX - dragStart.x;
+      const dy = event.clientY - dragStart.y;
+      const piece = dragStart.element;
 
-      if (!target || !gameBoard.contains(target)) return;
+      piece.style.transform = `translate(${dx}px, ${dy}px) scale(1.08)`;
 
-      const row = Number(target.dataset.row);
-      const col = Number(target.dataset.col);
-      const distance =
-        Math.abs(dragStart.row - row) +
-        Math.abs(dragStart.col - col);
+      const rect = gameBoard.getBoundingClientRect();
+      const cellWidth = rect.width / SIZE;
+      const cellHeight = rect.height / SIZE;
 
-      if (distance === 1) {
-        const start = dragStart;
-        dragStart = null;
-        swap(start.row, start.col, row, col);
+      let row = dragStart.row;
+      let col = dragStart.col;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (Math.abs(dx) < cellWidth * 0.35) return;
+        col += dx > 0 ? 1 : -1;
+      } else {
+        if (Math.abs(dy) < cellHeight * 0.35) return;
+        row += dy > 0 ? 1 : -1;
       }
+
+      if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) return;
+
+      const start = dragStart;
+      dragStart = null;
+      piece.style.transform = "";
+      piece.style.transition = "";
+      piece.style.zIndex = "";
+      piece.style.filter = "";
+      swap(start.row, start.col, row, col);
     });
 
-    gameBoard.addEventListener("pointerup", () => {
+    function finishDrag() {
+      if (dragStart?.element) {
+        dragStart.element.style.transform = "";
+        dragStart.element.style.transition = "";
+        dragStart.element.style.zIndex = "";
+        dragStart.element.style.filter = "";
+      }
       dragStart = null;
-    });
+    }
 
-    gameBoard.addEventListener("pointercancel", () => {
-      dragStart = null;
-    });
+    gameBoard.addEventListener("pointerup", finishDrag);
+    gameBoard.addEventListener("pointercancel", finishDrag);
   }
 
   function animateSwap(row1, col1, row2, col2, reverse = false) {
