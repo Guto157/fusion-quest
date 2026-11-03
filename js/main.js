@@ -1,5 +1,5 @@
 
-import { startBoard } from "./game/board.js?v=ice-obstacles1";
+import { startBoard } from "./game/board.js?v=stage-unlock2";
 
 const header = document.getElementById("header");
 const screen = document.getElementById("screen");
@@ -47,6 +47,21 @@ try {
   ownedCards = Array.isArray(savedCards) ? savedCards : [];
 } catch {
   ownedCards = [];
+}
+
+function renderCardArtwork(card) {
+  if (card.id !== "bomba-colorida") return card.emoji;
+  return `
+    <svg viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Bomba colorida" style="overflow:visible;filter:drop-shadow(0 4px 3px #0008)">
+      <path d="M39 13 C43 8 47 9 49 3" fill="none" stroke="#8b5a2b" stroke-width="4" stroke-linecap="round"/>
+      <path d="M49 3 L54 1 M49 3 L51 8 M49 3 L46 0" fill="none" stroke="#ffd166" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M32 12 A22 22 0 0 1 53 43 L32 32Z" fill="#ff416c" stroke="#fff" stroke-width="1.5"/>
+      <path d="M32 12 A22 22 0 0 0 11 43 L32 32Z" fill="#00b4d8" stroke="#fff" stroke-width="1.5"/>
+      <path d="M11 43 A22 22 0 0 0 53 43 L32 32Z" fill="#ffbd24" stroke="#fff" stroke-width="1.5"/>
+      <path d="M32 12 A22 22 0 0 1 53 43 A22 22 0 0 1 11 43 A22 22 0 0 1 32 12Z" fill="none" stroke="#fff" stroke-width="2"/>
+      <ellipse cx="23" cy="22" rx="7" ry="4" fill="#fff" opacity=".65" transform="rotate(-35 23 22)"/>
+      <circle cx="32" cy="32" r="3" fill="#fff" opacity=".8"/>
+    </svg>`;
 }
 
 function grantCard() {
@@ -249,7 +264,7 @@ function renderCollection() {
     const unlocked = ownedCards.includes(card.id);
     const color = rarityColors[card.rarity];
     return '<div style="background:#1b2342;border:1px solid ' + (unlocked ? color : "#303b63") + ';border-radius:16px;padding:16px 10px;text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
-      '<div style="font-size:43px;filter:' + (unlocked ? "none" : "grayscale(1)") + ';opacity:' + (unlocked ? "1" : ".35") + ';">' + (unlocked ? card.emoji : "❔") + '</div>' +
+      '<div style="font-size:43px;filter:' + (unlocked ? "none" : "grayscale(1)") + ';opacity:' + (unlocked ? "1" : ".35") + ';">' + (unlocked ? renderCardArtwork(card) : "❔") + '</div>' +
       '<strong style="font-size:14px;margin-top:9px;">' + (unlocked ? card.name : "Carta bloqueada") + '</strong>' +
       '<span style="font-size:11px;color:' + (unlocked ? color : "#aab3d0") + ';margin-top:6px;">' + (unlocked ? card.rarity : "Não descoberta") + '</span>' +
       (unlocked ? '<span style="font-size:11px;color:#aab3d0;margin-top:7px;">' + card.description + '</span>' : '') + '</div>';
