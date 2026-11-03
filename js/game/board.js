@@ -11,6 +11,7 @@ export function startBoard(container, onComplete) {
   let selected = null;
   let busy = false;
   let clearing = new Set();
+  let message = "Combine 3 ou mais peças iguais!";
 
   function randomPiece() {
     return Math.floor(Math.random() * TYPES.length);
@@ -26,6 +27,10 @@ export function startBoard(container, onComplete) {
     }
 
     score = 0;
+
+    if (!hasPossibleMove()) {
+      shuffleBoard();
+    }
   }
 
   function findMatches() {
@@ -64,6 +69,75 @@ export function startBoard(container, onComplete) {
     return [...matches].map(position =>
       position.split(",").map(Number)
     );
+  }
+
+  function hasPossibleMove() {
+    for (let row = 0; row < SIZE; row++) {
+      for (let col = 0; col < SIZE; col++) {
+        const neighbors = [
+          [row, col + 1],
+          [row + 1, col]
+        ];
+
+        for (const [nextRow, nextCol] of neighbors) {
+          if (nextRow >= SIZE || nextCol >= SIZE) continue;
+
+          const temp = board[row][col];
+          board[row][col] = board[nextRow][nextCol];
+          board[nextRow][nextCol] = temp;
+
+          const possible = findMatches().length > 0;
+
+          board[nextRow][nextCol] = board[row][col];
+          board[row][col] = temp;
+
+          if (possible) return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  function shuffleBoard() {
+    message = "Sem jogadas possíveis! Embaralhando...";
+
+    const pieces = board.flat();
+    let attempts = 0;
+
+    while (attempts < 1000) {
+      const shuffled = [...pieces];
+
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      board = Array.from({ length: SIZE }, (_, row) =>
+        shuffled.slice(row * SIZE, (row + 1) * SIZE)
+      );
+
+      if (
+        findMatches().length === 0 &&
+        hasPossibleMove()
+      ) {
+        message = "Tabuleiro renovado! Continue jogando.";
+        return;
+      }
+
+      attempts++;
+    }
+
+    do {
+      board = Array.from({ length: SIZE }, () =>
+        Array.from({ length: SIZE }, randomPiece)
+      );
+    } while (
+      findMatches().length > 0 ||
+      !hasPossibleMove()
+    );
+
+    message = "Tabuleiro renovado! Continue jogando.";
   }
 
   function removeMatches() {
@@ -136,7 +210,7 @@ export function startBoard(container, onComplete) {
       </div>
 
       <p class="board-message">
-        Combine 3 ou mais peças iguais!
+        ${message}
       </p>
     `;
 
@@ -260,6 +334,7 @@ export function startBoard(container, onComplete) {
     }
 
     moves--;
+    message = "Combine 3 ou mais peças iguais!";
 
     animateSwap(row1, col1, row2, col2)
       .then(() => {
@@ -299,6 +374,15 @@ export function startBoard(container, onComplete) {
 
   function finishTurn() {
     clearing.clear();
+
+    if (
+      score < TARGET * 10 &&
+      moves > 0 &&
+      !hasPossibleMove()
+    ) {
+      shuffleBoard();
+    }
+
     busy = false;
     render();
 
