@@ -255,3 +255,35 @@
 .board-result{background:radial-gradient(ellipse at 50% 0%,#3a6385,#1b3552 55%,#101f37);border:1px solid #a1c6df88;box-shadow:inset 0 2px 0 #ffffff33,0 18px 50px #000c;backdrop-filter:blur(14px);border-radius:24px}
 .board-result h2{font-size:23px;text-shadow:0 3px 12px #ffd16644}
 .board-result p{color:#d0e0f1}
+
+
+/* CELEBRACAO VISUAL DE COMBOS */
+.combo-celebration{
+  position:relative;
+  z-index:8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  width:max-content;
+  max-width:100%;
+  margin:12px auto -4px;
+  padding:10px 18px;
+  border:1px solid #ffe58a;
+  border-radius:16px;
+  color:#fff;
+  background:linear-gradient(135deg,#ff9f1c,#f04b72 52%,#7938c5);
+  box-shadow:0 0 0 3px #ffd16622,0 7px 22px #0008,0 0 24px #ffbd4a88;
+  animation:combo-pop .52s cubic-bezier(.16,1.4,.4,1) both,combo-glow .9s ease-in-out .52s infinite alternate;
+  transform-origin:center;
+}
+.combo-celebration strong{font-size:clamp(12px,3.5vw,16px);font-weight:1000;letter-spacing:.7px;text-shadow:0 2px 3px #762047}
+.combo-celebration b{font-size:clamp(24px,7vw,34px);line-height:1;color:#fff6a8;text-shadow:0 2px 0 #b54b20,0 0 12px #fff}
+.combo-celebration small{font-size:9px;font-weight:900;letter-spacing:.5px;color:#fff}
+.combo-spark{font-size:21px;color:#fff6a8;animation:combo-sparkle .7s ease-in-out infinite alternate}
+.combo-level-3{background:linear-gradient(135deg,#00b4d8,#5265e8 55%,#8c42d6);border-color:#9ef5ff}
+.combo-level-4,.combo-level-5{background:linear-gradient(135deg,#ffcf33,#ff713b 48%,#d52b86);border-color:#fff1a8;box-shadow:0 0 0 4px #ffd16633,0 8px 28px #0009,0 0 32px #ffbd4aaa}
+@keyframes combo-pop{0%{opacity:0;transform:translateY(18px) scale(.35) rotate(-7deg)}65%{opacity:1;transform:translateY(-4px) scale(1.12) rotate(2deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
+@keyframes combo-glow{from{filter:brightness(1);box-shadow:0 0 0 3px #ffd16622,0 7px 22px #0008,0 0 16px #ffbd4a66}to{filter:brightness(1.2);box-shadow:0 0 0 4px #ffd16644,0 7px 24px #0008,0 0 30px #ffbd4acc}}
+@keyframes combo-sparkle{from{transform:scale(.75) rotate(-18deg);opacity:.65}to{transform:scale(1.25) rotate(18deg);opacity:1}}
+@media(prefers-reduced-motion:reduce){.combo-celebration,.combo-spark{animation:none}}
