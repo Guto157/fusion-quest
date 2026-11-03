@@ -10,6 +10,7 @@ export function startBoard(container, onComplete) {
   let score = 0;
   let selected = null;
   let busy = false;
+  let clearing = new Set();
 
   function randomPiece() {
     return Math.floor(Math.random() * TYPES.length);
@@ -24,7 +25,7 @@ export function startBoard(container, onComplete) {
       removeMatches();
     }
 
-        score = 0;
+    score = 0;
   }
 
   function findMatches() {
@@ -104,10 +105,12 @@ export function startBoard(container, onComplete) {
           <span>PONTOS</span>
           <strong>${score}</strong>
         </div>
+
         <div class="board-stat">
           <span>MOVIMENTOS</span>
           <strong>${moves}</strong>
         </div>
+
         <div class="board-stat">
           <span>META</span>
           <strong>${TARGET * 10}</strong>
@@ -118,10 +121,13 @@ export function startBoard(container, onComplete) {
         ${board.map((line, row) =>
           line.map((piece, col) => `
             <button
-              class="game-piece ${selected && selected.row === row && selected.col === col ? "selected" : ""}"
+              class="game-piece
+                ${selected && selected.row === row && selected.col === col ? "selected" : ""}
+                ${clearing.has(`${row},${col}`) ? "clearing" : ""}"
               data-row="${row}"
               data-col="${col}"
               aria-label="Peça ${row + 1}, ${col + 1}"
+              ${clearing.has(`${row},${col}`) ? "disabled" : ""}
             >
               ${TYPES[piece]}
             </button>
@@ -189,9 +195,22 @@ export function startBoard(container, onComplete) {
   }
 
   function processMatches() {
-    const removed = removeMatches();
+    const matches = findMatches();
 
-    if (removed > 0) {
+    if (matches.length === 0) {
+      finishTurn();
+      return;
+    }
+
+    clearing = new Set(
+      matches.map(([row, col]) => `${row},${col}`)
+    );
+
+    render();
+
+    setTimeout(() => {
+      clearing.clear();
+      removeMatches();
       render();
 
       setTimeout(() => {
@@ -201,14 +220,11 @@ export function startBoard(container, onComplete) {
           finishTurn();
         }
       }, 180);
-
-      return;
-    }
-
-    finishTurn();
+    }, 350);
   }
 
   function finishTurn() {
+    clearing.clear();
     busy = false;
     render();
 
