@@ -114,6 +114,15 @@ const CARD_CATALOG = [
 
 let ownedCards = [];
 
+
+
+try {
+  const savedCards = JSON.parse(localStorage.getItem("fq_cards") || "[]");
+  ownedCards = Array.isArray(savedCards) ? savedCards : [];
+} catch {
+  ownedCards = [];
+}
+
 let cardLevels = {};
 try {
   const savedLevels = JSON.parse(localStorage.getItem("fq_card_levels") || "{}");
@@ -138,13 +147,6 @@ const CARD_RARITIES = [
 function saveCardProgress() {
   localStorage.setItem("fq_cards", JSON.stringify(ownedCards));
   localStorage.setItem("fq_card_levels", JSON.stringify(cardLevels));
-}
-
-try {
-  const savedCards = JSON.parse(localStorage.getItem("fq_cards") || "[]");
-  ownedCards = Array.isArray(savedCards) ? savedCards : [];
-} catch {
-  ownedCards = [];
 }
 
 function renderCardArtwork(card) {
