@@ -112,90 +112,96 @@ const CARD_CATALOG = [
   { id: "bomba-colorida", name: "Bomba Colorida", emoji: "💣", rarity: "Lendária", description: "Elimina todas as peças de uma cor." }
 ];
 
+const CARD_RARITIES = [
+  { id: "common", name: "Comum", className: "common", color: "#7ee68b", chance: 70 },
+  { id: "rare", name: "Rara", className: "rare", color: "#45c8ff", chance: 20 },
+  { id: "epic", name: "Épica", className: "epic", color: "#bd79ff", chance: 7 },
+  { id: "legendary", name: "Lendária", className: "legendary", color: "#ffd166", chance: 2.9 },
+  { id: "ultimate", name: "Ultimate", className: "ultimate", color: "#ff62d5", chance: 0.1 }
+];
+
 let ownedCards = [];
-
-
-
 try {
   const savedCards = JSON.parse(localStorage.getItem("fq_cards") || "[]");
-  ownedCards = Array.isArray(savedCards) ? savedCards : [];
+  // Migração: cartas antigas ficam preservadas como Comuns, sem apagar coleção.
+  ownedCards = Array.isArray(savedCards) ? savedCards.map(entry => {
+    if (typeof entry === "string") return { id: entry, rarity: "common" };
+    if (entry && typeof entry.id === "string") {
+      return { id: entry.id, rarity: CARD_RARITIES.some(r => r.id === entry.rarity) ? entry.rarity : "common" };
+    }
+    return null;
+  }).filter(Boolean) : [];
 } catch {
   ownedCards = [];
 }
 
-let cardLevels = {};
-try {
-  const savedLevels = JSON.parse(localStorage.getItem("fq_card_levels") || "{}");
-  cardLevels = savedLevels && typeof savedLevels === "object" ? savedLevels : {};
-} catch {
-  cardLevels = {};
-}
-
-// Cartas antigas continuam desbloqueadas e começam no nível Comum.
-ownedCards.forEach(cardId => {
-  if (!Number.isInteger(cardLevels[cardId])) cardLevels[cardId] = 0;
-});
-
-const CARD_RARITIES = [
-  { name: "Comum", className: "common", color: "#7ee68b" },
-  { name: "Rara", className: "rare", color: "#45c8ff" },
-  { name: "Épica", className: "epic", color: "#b56cff" },
-  { name: "Lendária", className: "legendary", color: "#ffd166" },
-  { name: "Ultimate", className: "ultimate", color: "#ff62d5" }
-];
-
+let cardPacks = Math.max(0, Number(localStorage.getItem("fq_card_packs") || 0));
 function saveCardProgress() {
   localStorage.setItem("fq_cards", JSON.stringify(ownedCards));
-  localStorage.setItem("fq_card_levels", JSON.stringify(cardLevels));
+  localStorage.setItem("fq_card_packs", String(cardPacks));
 }
 
-function renderCardArtwork(card) {
-  if (card.id !== "bomba-colorida") return card.emoji;
-  return `
-    <svg viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Bomba colorida" style="overflow:visible;filter:drop-shadow(0 4px 3px #0008)">
-      <path d="M39 13 C43 8 47 9 49 3" fill="none" stroke="#8b5a2b" stroke-width="4" stroke-linecap="round"/>
-      <path d="M49 3 L54 1 M49 3 L51 8 M49 3 L46 0" fill="none" stroke="#ffd166" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M32 12 A22 22 0 0 1 53 43 L32 32Z" fill="#ff416c" stroke="#fff" stroke-width="1.5"/>
-      <path d="M32 12 A22 22 0 0 0 11 43 L32 32Z" fill="#00b4d8" stroke="#fff" stroke-width="1.5"/>
-      <path d="M11 43 A22 22 0 0 0 53 43 L32 32Z" fill="#ffbd24" stroke="#fff" stroke-width="1.5"/>
-      <path d="M32 12 A22 22 0 0 1 53 43 A22 22 0 0 1 11 43 A22 22 0 0 1 32 12Z" fill="none" stroke="#fff" stroke-width="2"/>
-      <ellipse cx="23" cy="22" rx="7" ry="4" fill="#fff" opacity=".65" transform="rotate(-35 23 22)"/>
-      <circle cx="32" cy="32" r="3" fill="#fff" opacity=".8"/>
-    </svg>`;
+function renderCardArtwork(card, rarity) {
+  const palette = {
+    "gema-azul": ["#d9f8ff","#31baff","#0757cb"],
+    "gema-verde": ["#e1ffd7","#6bff58","#087b36"],
+    "gema-amarela": ["#fff6c7","#ffd84d","#c87908"],
+    "gema-vermelha": ["#ffe0e8","#ff4568","#9e103a"],
+    "gema-roxa": ["#f2d8ff","#bd62ff","#5510a8"],
+    "gema-diamante": ["#ffffff","#a9f6ff","#4275df"]
+  };
+  if (card.id === "foguete") {
+    return '<svg viewBox="0 0 100 100" role="img" aria-label="Foguete Explosivo"><defs><linearGradient id="rocketMetal" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".45" stop-color="#a9d9ff"/><stop offset="1" stop-color="#4264a8"/></linearGradient><linearGradient id="rocketFire" x2="0" y2="1"><stop stop-color="#fff6a0"/><stop offset=".45" stop-color="#ff9c28"/><stop offset="1" stop-color="#f12c52"/></linearGradient></defs><path d="M37 67 C22 77 25 89 15 94 C34 95 48 86 51 73Z" fill="url(#rocketFire)"/><path d="M50 74 C40 85 46 94 41 99 C59 92 67 81 64 68Z" fill="#ffcf4a"/><path d="M32 62 L15 70 L28 44 L42 48Z" fill="#e43e61" stroke="#fff" stroke-width="2"/><path d="M60 62 L79 70 L68 43 L53 47Z" fill="#e43e61" stroke="#fff" stroke-width="2"/><path d="M26 55 C26 31 44 11 70 5 C76 31 65 56 43 70Z" fill="url(#rocketMetal)" stroke="#fff" stroke-width="3"/><circle cx="54" cy="36" r="9" fill="#1764b5" stroke="#eafaff" stroke-width="4"/><path d="M59 17 Q68 20 69 30" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>';
+  }
+  if (card.id === "bomba-colorida") {
+    return '<svg viewBox="0 0 100 100" role="img" aria-label="Bomba Colorida"><defs><radialGradient id="bombBody" cx=".3" cy=".2"><stop stop-color="#fff"/><stop offset=".25" stop-color="#c9a5ff"/><stop offset="1" stop-color="#38215e"/></radialGradient></defs><path d="M59 22 Q68 9 82 12" fill="none" stroke="#b7a0a0" stroke-width="7" stroke-linecap="round"/><path d="M80 12 L87 4 M80 12 L91 14 M80 12 L77 2" stroke="#ffe16a" stroke-width="4" stroke-linecap="round"/><circle cx="48" cy="57" r="34" fill="url(#bombBody)" stroke="#fff" stroke-width="3"/><path d="M48 23 A34 34 0 0 1 80 68 L48 57Z" fill="#ff4b78" opacity=".9"/><path d="M17 68 A34 34 0 0 1 48 23 L48 57Z" fill="#28c9ff" opacity=".9"/><path d="M17 68 A34 34 0 0 0 80 68 L48 57Z" fill="#ffd23f" opacity=".9"/><circle cx="48" cy="57" r="34" fill="none" stroke="#fff" stroke-width="3"/><path d="M35 50 L61 50 L61 64 Q48 74 35 64Z" fill="#14172c"/><circle cx="41" cy="55" r="3" fill="#fff"/><circle cx="55" cy="55" r="3" fill="#fff"/><path d="M43 64 L48 59 L53 64" fill="none" stroke="#fff" stroke-width="2.5"/></svg>';
+  }
+  const colors = palette[card.id] || palette["gema-azul"];
+  const id = card.id.replace(/[^a-z0-9]/gi, "");
+  return '<svg viewBox="0 0 100 100" role="img" aria-label="' + card.name + '">' +
+    '<defs><linearGradient id="gem' + id + '" x1="0" y1="0" x2="1" y2="1"><stop stop-color="' + colors[0] + '"/><stop offset=".48" stop-color="' + colors[1] + '"/><stop offset="1" stop-color="' + colors[2] + '"/></linearGradient><linearGradient id="facet' + id + '" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="' + colors[1] + '" stop-opacity=".15"/></linearGradient></defs>' +
+    '<path d="M50 5 L84 25 L94 57 L50 94 L6 57 L16 25Z" fill="url(#gem' + id + ')" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>' +
+    '<path d="M16 25 L50 5 L50 48 L6 57Z" fill="url(#facet' + id + ')"/><path d="M50 5 L84 25 L94 57 L50 48Z" fill="#fff" opacity=".28"/><path d="M6 57 L50 48 L50 94Z" fill="' + colors[2] + '" opacity=".52"/><path d="M94 57 L50 48 L50 94Z" fill="' + colors[1] + '" opacity=".62"/><path d="M16 25 L84 25 M50 5 L50 48 M6 57 L50 48 L94 57" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="2"/><path d="M25 27 L43 17" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/></svg>';
+}
+
+function rollCardRarity() {
+  const roll = Math.random() * 100;
+  let edge = 0;
+  for (const rarity of CARD_RARITIES) {
+    edge += rarity.chance;
+    if (roll < edge) return rarity;
+  }
+  return CARD_RARITIES[CARD_RARITIES.length - 1];
+}
+
+function drawOneCard() {
+  const card = CARD_CATALOG[Math.floor(Math.random() * CARD_CATALOG.length)];
+  const rarity = rollCardRarity();
+  const found = { id: card.id, rarity: rarity.id };
+  ownedCards.push(found);
+  return { card, rarity };
 }
 
 function grantCard() {
-  // Primeiro descobre as oito cartas. Depois evolui as que ainda não são Ultimate.
-  const undiscovered = CARD_CATALOG.filter(item => !ownedCards.includes(item.id));
-  const canUpgrade = CARD_CATALOG.filter(item =>
-    ownedCards.includes(item.id) && (Number(cardLevels[item.id]) || 0) < 4
-  );
-  const candidates = undiscovered.length ? undiscovered : canUpgrade;
-
-  if (candidates.length === 0) {
-    player.coins += 100;
-    return { duplicate: true, coins: 100 };
-  }
-
-  const card = candidates[Math.floor(Math.random() * candidates.length)];
-  const alreadyOwned = ownedCards.includes(card.id);
-
-  if (!alreadyOwned) {
-    ownedCards.push(card.id);
-    cardLevels[card.id] = 0;
+  // Ao concluir uma fase: 15% de chance de encontrar um pacote, caso contrário uma carta.
+  if (Math.random() < 0.15) {
+    cardPacks += 1;
     saveCardProgress();
-    return { duplicate: false, card, rarity: CARD_RARITIES[0], unlocked: true };
+    return { type: "pack" };
   }
-
-  const currentLevel = Math.max(0, Math.min(4, Number(cardLevels[card.id]) || 0));
-  cardLevels[card.id] = currentLevel + 1;
+  const found = drawOneCard();
   saveCardProgress();
-  return {
-    duplicate: false,
-    card,
-    rarity: CARD_RARITIES[currentLevel + 1],
-    upgraded: true
-  };
+  return { type: "card", ...found };
+}
+
+function openCardPack() {
+  if (cardPacks <= 0) return;
+  cardPacks -= 1;
+  const foundCards = [drawOneCard(), drawOneCard(), drawOneCard()];
+  saveCardProgress();
+  renderCollection();
+  const summary = foundCards.map(found => found.card.name + " (" + found.rarity.name + ")").join(", ");
+  showToast("Pacote aberto! " + summary);
 }
 
 const screens = {
@@ -344,12 +350,10 @@ function renderGame() {
     selectedStage = player.stage;
     navigate("home");
 
-    if (cardReward.duplicate) {
-      showToast("Carta Ultimate! +" + cardReward.coins + " moedas extras.");
-    } else if (cardReward.upgraded) {
-      showToast(cardReward.card.name + " evoluiu para " + cardReward.rarity.name + "!");
+    if (cardReward.type === "pack") {
+      showToast("🎁 Você encontrou um pacote de cartas! Abra na sua coleção.");
     } else {
-      showToast("Nova carta: " + cardReward.card.name + " (Comum)!");
+      showToast("🃏 Carta encontrada: " + cardReward.card.name + " • " + cardReward.rarity.name + "!");
     }
   }, selectedStage, () => {
     selectedStage = player.stage;
@@ -361,39 +365,32 @@ function renderGame() {
 }
 
 function renderCollection() {
-  const unlockedCount = CARD_CATALOG.filter(card => ownedCards.includes(card.id)).length;
-  const maxProgress = CARD_CATALOG.length * 5;
-  const currentProgress = CARD_CATALOG.reduce((total, card) =>
-    total + (ownedCards.includes(card.id) ? (Number(cardLevels[card.id]) || 0) + 1 : 0), 0);
+  const totalCards = CARD_CATALOG.length * CARD_RARITIES.length;
+  const uniqueFound = CARD_CATALOG.reduce((total, card) =>
+    total + CARD_RARITIES.filter(rarity => ownedCards.some(entry => entry.id === card.id && entry.rarity === rarity.id)).length, 0);
 
-  const cardsHTML = CARD_CATALOG.map(card => {
-    const unlocked = ownedCards.includes(card.id);
-    const level = unlocked ? Math.max(0, Math.min(4, Number(cardLevels[card.id]) || 0)) : -1;
-    const rarity = unlocked ? CARD_RARITIES[level] : null;
-    const levelLabel = rarity ? rarity.name : "Não descoberta";
-    const className = rarity ? rarity.className : "locked";
-    const artwork = unlocked ? renderCardArtwork(card) : "❔";
-    const pips = CARD_RARITIES.map((entry, index) =>
-      '<i class="card-level-pip ' + (unlocked && index <= level ? "active " + entry.className : "") + '"></i>'
-    ).join("");
-
+  const cardsHTML = CARD_CATALOG.flatMap(card => CARD_RARITIES.map(rarity => {
+    const count = ownedCards.filter(entry => entry.id === card.id && entry.rarity === rarity.id).length;
+    const className = count > 0 ? rarity.className : "locked " + rarity.className;
     return '<article class="fusion-card ' + className + '">' +
-      '<div class="fusion-card-rarity">' + levelLabel + '</div>' +
-      '<div class="fusion-card-art">' + artwork + '</div>' +
-      '<strong class="fusion-card-name">' + (unlocked ? card.name : "Carta bloqueada") + '</strong>' +
-      '<div class="fusion-card-levels" aria-label="Nível ' + (level + 1) + ' de 5">' + pips + '</div>' +
-      '<span class="fusion-card-description">' + (unlocked ? card.description : "Conclua fases para descobrir") + '</span>' +
-      (unlocked && level < 4 ? '<small class="fusion-card-next">Próxima: ' + CARD_RARITIES[level + 1].name + '</small>' :
-        unlocked ? '<small class="fusion-card-next">NÍVEL MÁXIMO</small>' : '') +
+      '<div class="fusion-card-rarity">' + rarity.name + '</div>' +
+      '<div class="fusion-card-art">' + renderCardArtwork(card, rarity) + '</div>' +
+      '<strong class="fusion-card-name">' + card.name + '</strong>' +
+      '<span class="fusion-card-description">' + (count > 0 ? "Encontrada" : "Ainda não encontrada") + '</span>' +
+      '<span class="fusion-card-count">' + (count > 0 ? "×" + count : "—") + '</span>' +
     '</article>';
-  }).join("");
+  })).join("");
 
   screen.innerHTML = '<h2 class="section-title">🃏 Coleção de cartas</h2>' +
-    '<div class="card-panel collection-progress"><div><strong>Cartas descobertas</strong><b>' + unlockedCount + '/' + CARD_CATALOG.length + '</b></div>' +
-    '<div class="collection-progress-track"><i style="width:' + (currentProgress / maxProgress * 100) + '%"></i></div>' +
-    '<small>Progresso de evolução: ' + currentProgress + '/' + maxProgress + ' níveis</small></div>' +
+    '<div class="card-panel collection-progress"><div><strong>Cartas encontradas</strong><b>' + uniqueFound + '/' + totalCards + '</b></div>' +
+    '<div class="collection-progress-track"><i style="width:' + (uniqueFound / totalCards * 100) + '%"></i></div>' +
+    '<small>Pacotes disponíveis: ' + cardPacks + ' • Cada pacote contém 3 cartas</small>' +
+    '<button class="open-card-pack" id="open-card-pack" ' + (cardPacks > 0 ? "" : "disabled") + '>🎁 Abrir pacote (' + cardPacks + ')</button></div>' +
     '<div class="fusion-card-grid">' + cardsHTML + '</div>' +
-    '<p class="collection-tip">Cada carta possui 5 raridades. Cartas repetidas evoluem para o próximo nível. Ao atingir Ultimate, novas cópias rendem 100 moedas.</p>';
+    '<p class="collection-tip">Cada carta pode ser encontrada em cinco raridades. Repetidas contam como cópias extras, sem alterar a raridade.</p>';
+
+  const openButton = document.getElementById("open-card-pack");
+  if (openButton) openButton.addEventListener("click", openCardPack);
 }
 
 function renderRewards() {
