@@ -639,3 +639,26 @@ body{min-height:0}
 @keyframes ultimatePulse{0%,100%{box-shadow:inset 0 0 18px #ff62d533,0 0 8px #ff62d5,0 0 18px #7c5cff88,0 7px 15px #02081788}50%{box-shadow:inset 0 0 24px #ff62d555,0 0 12px #fff,0 0 27px #7c5cff,0 7px 15px #02081788}}
 .collection-progress small{display:block}
 @media(max-width:360px){.fusion-card{min-height:155px}.fusion-card-art{width:74px;height:68px;flex-basis:68px}.fusion-card-art svg{width:66px;height:66px}}
+
+
+/* Coleções separadas por item, com as cinco cartas lado a lado */
+.card-collections-list{display:flex;flex-direction:column;gap:13px;padding:3px 2px 18px}
+.card-collection-set{padding:10px;border:1px solid #344a70;border-radius:15px;background:linear-gradient(145deg,#172b49,#101b31);box-shadow:0 6px 16px #02081766;min-width:0}
+.card-collection-set.set-complete{border-color:#ffd166;box-shadow:inset 0 0 16px #ffd16612,0 0 12px #ffd16644}
+.card-set-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-set-heading>div{display:flex;flex-direction:column;gap:3px}
+.card-set-heading strong{font-size:13px;color:#f1f6ff}
+.card-set-heading small{font-size:9px;color:#aebed2}
+.card-set-heading>span{font-size:9px;font-weight:900;color:#ffd166;white-space:nowrap}
+.card-set-progress{height:5px;background:#091326;border-radius:20px;overflow:hidden;margin:8px 0}
+.card-set-progress i{display:block;height:100%;background:linear-gradient(90deg,#50e5a2,#ffd166);border-radius:20px;box-shadow:0 0 8px #50e5a288}
+.card-set-grid{display:grid;grid-template-columns:repeat(5,minmax(86px,1fr));gap:6px;overflow-x:auto;padding:3px 2px 8px;scrollbar-width:thin;scrollbar-color:#657d9c transparent}
+.card-set-grid .fusion-card{min-width:86px;min-height:132px;padding:7px 4px;border-radius:10px}
+.card-set-grid .fusion-card-art{width:62px;height:58px;flex-basis:58px;margin:3px 0}
+.card-set-grid .fusion-card-art svg{width:55px;height:55px}
+.card-set-grid .fusion-card-rarity{font-size:8px;letter-spacing:.5px}
+.card-set-grid .fusion-card-name{font-size:8px;min-height:19px}
+.card-set-grid .fusion-card-description{font-size:7px;min-height:12px}
+.card-set-grid .fusion-card-count{font-size:9px;padding:1px 7px}
+.card-set-reward{margin-top:4px;padding:7px 8px;border-radius:8px;background:#0b1628;color:#ffd98a;font-size:9px;line-height:1.35;text-align:center;font-weight:800}
+.card-collection-set.set-complete .card-set-reward{background:#40341b;color:#fff0b8}
