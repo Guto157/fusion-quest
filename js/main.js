@@ -38,7 +38,8 @@ function saveInventory() {
 }
 
 function getDailyCardPackUsage() {
-  const today = new Date().toLocaleDateString("en-CA");
+  const now = new Date();
+  const today = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
   let usage = {};
   try {
     const saved = JSON.parse(localStorage.getItem("fq_daily_card_pack_usage") || "{}");
@@ -116,6 +117,7 @@ function buyCardShopPack(packId, method) {
 }
 
 function renderStore() {
+  dailyCardPackUsage = getDailyCardPackUsage();
   const cards = STORE_ITEMS.map(item => {
     const quantity = inventory[item.id] || 0;
     return `
