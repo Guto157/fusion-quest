@@ -390,6 +390,8 @@ function renderCollection() {
     '<div class="card-panel collection-progress"><div><strong>Cartas encontradas</strong><b>' + uniqueFound + '/' + totalCards + '</b></div>' +
     '<div class="collection-progress-track"><i style="width:' + (uniqueFound / totalCards * 100) + '%"></i></div>' +
     '<small>Pacotes disponíveis: ' + cardPacks + ' • Cada pacote contém 3 cartas</small>' +
+    '<small class="card-drop-rates">Chances por carta: Comum 70% • Rara 20% • Épica 7% • Lendária 2,9% • Ultimate 0,1%</small>' +
+    '<small>Ao terminar uma fase: 15% de chance de encontrar um pacote.</small>' +
     '<button class="open-card-pack" id="open-card-pack" ' + (cardPacks > 0 ? "" : "disabled") + '>🎁 Abrir pacote (' + cardPacks + ')</button></div>' +
     '<div class="fusion-card-grid">' + cardsHTML + '</div>' +
     '<p class="collection-tip">Cada carta pode ser encontrada em cinco raridades. Repetidas contam como cópias extras, sem alterar a raridade.</p>';
