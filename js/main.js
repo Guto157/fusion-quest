@@ -114,6 +114,32 @@ const CARD_CATALOG = [
 
 let ownedCards = [];
 
+let cardLevels = {};
+try {
+  const savedLevels = JSON.parse(localStorage.getItem("fq_card_levels") || "{}");
+  cardLevels = savedLevels && typeof savedLevels === "object" ? savedLevels : {};
+} catch {
+  cardLevels = {};
+}
+
+// Cartas antigas continuam desbloqueadas e começam no nível Comum.
+ownedCards.forEach(cardId => {
+  if (!Number.isInteger(cardLevels[cardId])) cardLevels[cardId] = 0;
+});
+
+const CARD_RARITIES = [
+  { name: "Comum", className: "common", color: "#7ee68b" },
+  { name: "Rara", className: "rare", color: "#45c8ff" },
+  { name: "Épica", className: "epic", color: "#b56cff" },
+  { name: "Lendária", className: "legendary", color: "#ffd166" },
+  { name: "Ultimate", className: "ultimate", color: "#ff62d5" }
+];
+
+function saveCardProgress() {
+  localStorage.setItem("fq_cards", JSON.stringify(ownedCards));
+  localStorage.setItem("fq_card_levels", JSON.stringify(cardLevels));
+}
+
 try {
   const savedCards = JSON.parse(localStorage.getItem("fq_cards") || "[]");
   ownedCards = Array.isArray(savedCards) ? savedCards : [];
@@ -137,19 +163,30 @@ function renderCardArtwork(card) {
 }
 
 function grantCard() {
-  const availableCards = CARD_CATALOG.filter(item => !ownedCards.includes(item.id));
-  const card = availableCards.length
-    ? availableCards[Math.floor(Math.random() * availableCards.length)]
-    : null;
+  const card = CARD_CATALOG[Math.floor(Math.random() * CARD_CATALOG.length)];
+  const alreadyOwned = ownedCards.includes(card.id);
 
-  if (!card) {
-    player.coins += 50;
-    return { duplicate: true, coins: 50 };
+  if (!alreadyOwned) {
+    ownedCards.push(card.id);
+    cardLevels[card.id] = 0;
+    saveCardProgress();
+    return { duplicate: false, card, rarity: CARD_RARITIES[0], unlocked: true };
   }
 
-  ownedCards.push(card.id);
-  localStorage.setItem("fq_cards", JSON.stringify(ownedCards));
-  return { duplicate: false, card };
+  const currentLevel = Math.max(0, Math.min(4, Number(cardLevels[card.id]) || 0));
+  if (currentLevel < 4) {
+    cardLevels[card.id] = currentLevel + 1;
+    saveCardProgress();
+    return {
+      duplicate: false,
+      card,
+      rarity: CARD_RARITIES[currentLevel + 1],
+      upgraded: true
+    };
+  }
+
+  player.coins += 100;
+  return { duplicate: true, coins: 100, card };
 }
 
 const screens = {
@@ -313,22 +350,39 @@ function renderGame() {
 }
 
 function renderCollection() {
-  const rarityColors = { "Comum": "#8c9bad", "Rara": "#38bdf8", "Épica": "#b56cff", "Lendária": "#ffd166" };
   const unlockedCount = CARD_CATALOG.filter(card => ownedCards.includes(card.id)).length;
+  const maxProgress = CARD_CATALOG.length * 5;
+  const currentProgress = CARD_CATALOG.reduce((total, card) =>
+    total + (ownedCards.includes(card.id) ? (Number(cardLevels[card.id]) || 0) + 1 : 0), 0);
+
   const cardsHTML = CARD_CATALOG.map(card => {
     const unlocked = ownedCards.includes(card.id);
-    const color = rarityColors[card.rarity];
-    return '<div style="background:#1b2342;border:1px solid ' + (unlocked ? color : "#303b63") + ';border-radius:16px;padding:16px 10px;text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
-      '<div style="font-size:43px;filter:' + (unlocked ? "none" : "grayscale(1)") + ';opacity:' + (unlocked ? "1" : ".35") + ';">' + (unlocked ? renderCardArtwork(card) : "❔") + '</div>' +
-      '<strong style="font-size:14px;margin-top:9px;">' + (unlocked ? card.name : "Carta bloqueada") + '</strong>' +
-      '<span style="font-size:11px;color:' + (unlocked ? color : "#aab3d0") + ';margin-top:6px;">' + (unlocked ? card.rarity : "Não descoberta") + '</span>' +
-      (unlocked ? '<span style="font-size:11px;color:#aab3d0;margin-top:7px;">' + card.description + '</span>' : '') + '</div>';
+    const level = unlocked ? Math.max(0, Math.min(4, Number(cardLevels[card.id]) || 0)) : -1;
+    const rarity = unlocked ? CARD_RARITIES[level] : null;
+    const levelLabel = rarity ? rarity.name : "Não descoberta";
+    const className = rarity ? rarity.className : "locked";
+    const artwork = unlocked ? renderCardArtwork(card) : "❔";
+    const pips = CARD_RARITIES.map((entry, index) =>
+      '<i class="card-level-pip ' + (unlocked && index <= level ? "active " + entry.className : "") + '"></i>'
+    ).join("");
+
+    return '<article class="fusion-card ' + className + '">' +
+      '<div class="fusion-card-rarity">' + levelLabel + '</div>' +
+      '<div class="fusion-card-art">' + artwork + '</div>' +
+      '<strong class="fusion-card-name">' + (unlocked ? card.name : "Carta bloqueada") + '</strong>' +
+      '<div class="fusion-card-levels" aria-label="Nível ' + (level + 1) + ' de 5">' + pips + '</div>' +
+      '<span class="fusion-card-description">' + (unlocked ? card.description : "Conclua fases para descobrir") + '</span>' +
+      (unlocked && level < 4 ? '<small class="fusion-card-next">Próxima: ' + CARD_RARITIES[level + 1].name + '</small>' :
+        unlocked ? '<small class="fusion-card-next">NÍVEL MÁXIMO</small>' : '') +
+    '</article>';
   }).join("");
+
   screen.innerHTML = '<h2 class="section-title">🃏 Coleção de cartas</h2>' +
-    '<div class="card-panel"><div style="display:flex;justify-content:space-between;"><strong>Cartas desbloqueadas</strong><strong style="color:#20d9c2;">' + unlockedCount + '/' + CARD_CATALOG.length + '</strong></div>' +
-    '<div style="height:10px;background:#10152b;border-radius:20px;overflow:hidden;margin-top:12px;"><div style="height:100%;width:' + (unlockedCount / CARD_CATALOG.length * 100) + '%;background:#20d9c2;border-radius:20px;"></div></div></div>' +
-    '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">' + cardsHTML + '</div>' +
-    '<p class="muted" style="font-size:12px;text-align:center;margin-top:16px;">Conclua fases para desbloquear cartas. Depois de completar a coleção, cartas repetidas viram moedas.</p>';
+    '<div class="card-panel collection-progress"><div><strong>Cartas descobertas</strong><b>' + unlockedCount + '/' + CARD_CATALOG.length + '</b></div>' +
+    '<div class="collection-progress-track"><i style="width:' + (currentProgress / maxProgress * 100) + '%"></i></div>' +
+    '<small>Progresso de evolução: ' + currentProgress + '/' + maxProgress + ' níveis</small></div>' +
+    '<div class="fusion-card-grid">' + cardsHTML + '</div>' +
+    '<p class="collection-tip">Cada carta possui 5 raridades. Cartas repetidas evoluem para o próximo nível. Ao atingir Ultimate, novas cópias rendem 100 moedas.</p>';
 }
 
 function renderRewards() {
