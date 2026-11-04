@@ -703,3 +703,40 @@ body{min-height:0}
 .shop-pack-actions .store-buy-coins{background:linear-gradient(110deg,#6e4a17,#a97825);color:#fff0c2;border:1px solid #d6a94c}
 .shop-pack-actions .store-buy-ad{background:linear-gradient(110deg,#174f49,#207d70);color:#c7fff0;border:1px solid #35bda4}
 .shop-pack-actions button:disabled{opacity:.42;filter:grayscale(.7)}
+
+
+/* Loja compacta com rolagem vertical da tela inteira */
+.store-view{height:100dvh;min-height:100vh;overflow:hidden}
+.store-view #screen{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;padding:8px 2px 105px;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scrollbar-width:thin;scrollbar-color:#657d9c transparent}
+.store-view .section-title{font-size:19px;margin:0 0 9px}
+.store-view .store-intro{padding:9px 11px;margin-bottom:9px;border-radius:12px}
+.store-view .store-intro strong{font-size:11px}
+.store-view .store-intro p{font-size:9px;margin-top:2px}
+.store-view .store-intro>span{padding:7px 9px;font-size:11px}
+.store-view .store-subtitle{font-size:13px;margin:10px 2px 5px}
+.store-view .store-pack-limit{font-size:9px;margin:0 3px 7px}
+.store-view .shop-card-packs-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:12px}
+.store-view .shop-card-pack{padding:8px;border-radius:11px;box-shadow:inset 0 0 12px color-mix(in srgb,var(--pack-color) 8%,transparent),0 3px 8px #02081755}
+.store-view .shop-pack-top{gap:6px;align-items:center;flex-wrap:wrap}
+.store-view .shop-pack-icon{width:30px;height:30px;flex-basis:30px;border-radius:8px;font-size:18px}
+.store-view .shop-pack-top>div{flex:1 1 calc(100% - 40px);min-width:0}
+.store-view .shop-pack-top strong{font-size:10px;line-height:1.2;display:block}
+.store-view .shop-pack-top p{font-size:8px;line-height:1.2;margin-top:2px}
+.store-view .shop-pack-price{font-size:9px;margin-left:36px;margin-top:-2px}
+.store-view .shop-pack-chances{margin:6px 0;padding:5px 6px;font-size:8px;line-height:1.55;min-height:48px}
+.store-view .shop-pack-actions{grid-template-columns:1fr;gap:4px}
+.store-view .shop-pack-actions button{padding:6px 3px;font-size:9px;border-radius:7px}
+.store-view .store-list{overflow:visible;gap:6px}
+.store-view .store-item{grid-template-columns:36px minmax(0,1fr);gap:7px;padding:7px;border-radius:11px}
+.store-view .store-item-art{width:35px;height:35px;border-radius:9px;font-size:21px}
+.store-view .store-item-info strong{font-size:10px}
+.store-view .store-item-info p{font-size:8px;margin:2px 0}
+.store-view .store-item-info small{font-size:8px}
+.store-view .store-item-actions{gap:5px}
+.store-view .store-item-actions button{padding:7px 4px;font-size:9px;border-radius:8px}
+.store-view .store-ad-note{padding:7px 6px 12px;font-size:8px}
+@media(max-width:350px){
+ .store-view .shop-card-packs-list{grid-template-columns:1fr}
+ .store-view .shop-pack-actions{grid-template-columns:1fr 1fr}
+ .store-view .shop-pack-chances{min-height:0}
+}
