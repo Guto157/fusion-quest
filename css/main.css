@@ -470,3 +470,101 @@ body{min-height:0}
 .store-buy-ad{color:#d5e3f3;background:#344b6d;border:1px solid #8aa6c255}
 .store-buy-ad:disabled{opacity:.48;cursor:not-allowed}
 .store-ad-note{flex:0 0 auto;text-align:center;color:#91a9c3;font-size:9px;line-height:1.4;padding:4px 8px 0}
+
+
+/* COLEÇÃO DE CARTAS: CINCO RARIDADES COM EVOLUÇÃO VISUAL */
+.fusion-card-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:5px 4px 14px;
+  scrollbar-width:thin;
+  scrollbar-color:#7896a8 transparent;
+}
+.collection-progress{padding:10px 12px;margin-bottom:8px}
+.collection-progress>div:first-child{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.collection-progress>div:first-child b{color:#8affdf}
+.collection-progress-track{height:7px;border-radius:20px;background:#091326;overflow:hidden;margin:8px 0 5px}
+.collection-progress-track i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#45f0cf,#a56cff,#ff62d5);box-shadow:0 0 10px #45f0cf88}
+.collection-progress small{font-size:9px;color:#b7c5dc}
+.fusion-card{
+  --card-neon:#7ee68b;
+  position:relative;
+  isolation:isolate;
+  min-width:0;
+  min-height:174px;
+  padding:10px 8px 9px;
+  border:1px solid color-mix(in srgb,var(--card-neon) 75%,white 25%);
+  border-radius:15px;
+  background:linear-gradient(150deg,#233a56 0%,#14233d 58%,#0d1930 100%);
+  box-shadow:inset 0 1px 0 #ffffff24,0 0 9px color-mix(in srgb,var(--card-neon) 35%,transparent),0 7px 15px #02081788;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  text-align:center;
+  overflow:hidden;
+}
+.fusion-card:before{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border:1px solid color-mix(in srgb,var(--card-neon) 40%,transparent);
+  border-radius:11px;
+  pointer-events:none;
+  z-index:-1;
+}
+.fusion-card-rarity{
+  align-self:stretch;
+  color:var(--card-neon);
+  font-size:9px;
+  font-weight:1000;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  text-shadow:0 0 8px var(--card-neon);
+}
+.fusion-card-art{
+  width:75px;
+  height:70px;
+  flex:0 0 70px;
+  margin:6px 0 4px;
+  display:grid;
+  place-items:center;
+  font-size:53px;
+  line-height:1;
+  filter:drop-shadow(0 5px 3px #020817cc);
+  transform-origin:center;
+}
+.fusion-card-art svg{width:58px;height:58px}
+.fusion-card-name{font-size:11px;line-height:1.2;min-height:25px;display:flex;align-items:center;justify-content:center}
+.fusion-card-levels{display:flex;gap:5px;justify-content:center;margin:5px 0}
+.card-level-pip{width:8px;height:8px;border-radius:50%;background:#46536a;border:1px solid #8291a9}
+.card-level-pip.active{background:var(--pip-color,var(--card-neon));border-color:#fff;box-shadow:0 0 7px var(--card-neon)}
+.fusion-card-description{font-size:8px;line-height:1.25;color:#bdcce0;min-height:20px}
+.fusion-card-next{font-size:8px;color:var(--card-neon);font-weight:900;letter-spacing:.5px;margin-top:4px}
+.fusion-card.common{--card-neon:#7ee68b}
+.fusion-card.rare{--card-neon:#45c8ff;background:linear-gradient(150deg,#174b70,#14233d 62%,#0d1930)}
+.fusion-card.epic{--card-neon:#bd79ff;background:linear-gradient(150deg,#42266c,#1d234a 62%,#10172e);box-shadow:inset 0 2px 0 #ffffff30,0 0 13px #bd79ff66,0 7px 15px #02081788}
+.fusion-card.legendary{--card-neon:#ffd166;background:radial-gradient(ellipse at 50% 20%,#80602c,#302849 60%,#151d35);box-shadow:inset 0 2px 0 #fff5c455,0 0 16px #ffd16677,0 7px 15px #02081788}
+.fusion-card.ultimate{--card-neon:#ff62d5;background:radial-gradient(ellipse at 50% 15%,#733d88,#25224c 52%,#10172e);border:2px solid #ff8be4;box-shadow:inset 0 0 18px #ff62d533,0 0 8px #ff62d5,0 0 22px #7c5cffaa,0 7px 15px #02081788}
+.fusion-card.ultimate:before{border-color:#ffb5ed;box-shadow:inset 0 0 12px #ff62d555}
+.fusion-card.rare .fusion-card-art{filter:drop-shadow(0 0 3px #45c8ff) saturate(1.35);transform:scale(1.04)}
+.fusion-card.epic .fusion-card-art{filter:drop-shadow(0 5px 2px #020817) drop-shadow(0 0 8px #bd79ff) saturate(1.5);transform:perspective(150px) rotateX(8deg) scale(1.08)}
+.fusion-card.legendary .fusion-card-art{filter:drop-shadow(0 0 5px #ffd166) drop-shadow(0 0 11px #ff9f43) saturate(1.8) contrast(1.08);transform:scale(1.1)}
+.fusion-card.ultimate .fusion-card-art{filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 12px #ff62d5) drop-shadow(0 0 20px #7c5cff) saturate(1.9) contrast(1.12);transform:scale(1.13)}
+.fusion-card.locked{--card-neon:#64748b;opacity:.72;filter:saturate(.25)}
+.collection-tip{flex:0 0 auto;text-align:center;color:#aebed2;font-size:9px;line-height:1.4;padding:3px 8px 5px}
+@media(max-width:360px){
+  .fusion-card-grid{gap:8px}
+  .fusion-card{min-height:164px;padding:8px 5px}
+  .fusion-card-art{font-size:47px;width:66px;height:63px;flex-basis:63px}
+  .fusion-card-name{font-size:10px}
+}
+@media(max-height:700px){
+  .fusion-card{min-height:150px;padding-top:7px}
+  .fusion-card-art{height:56px;flex-basis:56px;font-size:45px;margin:4px 0}
+}
