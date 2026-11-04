@@ -168,6 +168,15 @@ function renderHome() {
   }).join("");
 
   screen.innerHTML = `
+    <div class="map-section-heading"><div><strong>Sua jornada</strong><small>Avance pelo caminho e desbloqueie novas fases</small></div><span>🌿</span></div>
+    <section class="quest-map">
+      <div class="quest-land quest-land-one"></div><div class="quest-land quest-land-two"></div>
+      <svg class="quest-route" viewBox="0 0 340 510" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M170 70 C170 135 65 125 65 220 S275 285 275 365 S170 425 170 475" />
+      </svg>
+      ${stagesHTML}
+      <div class="map-more-hint">✨ Continue vencendo para revelar o próximo trecho do caminho</div>
+    </section>
     <div class="map-account-progress"><span>NÍVEL ${player.level}</span><div class="map-account-track"><i style="width:${Math.min(player.xp,100)}%"></i></div><span>${player.xp}/100 XP</span></div>
   `;
 
