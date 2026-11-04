@@ -306,6 +306,9 @@ function renderGame() {
   }, selectedStage, () => {
     selectedStage = player.stage;
     navigate("home");
+  }, inventory, (itemId, quantity) => {
+    inventory[itemId] = quantity;
+    saveInventory();
   });
 }
 
