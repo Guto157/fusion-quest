@@ -14,7 +14,7 @@ function getStageConfig(stage) {
   return { name: "NORMAL", moves: 18, targetBonus: 40, winChance: 80, obstacles: 0 };
 }
 
-export function startBoard(container, onComplete, stage = 1, onHome = () => {}) {
+export function startBoard(container, onComplete, stage = 1, onHome = () => {}, inventory = {}, onInventoryChange = () => {}) {
   const difficulty = getStageConfig(stage);
   const progressionBonus = Math.floor((stage - 1) / 10) * 100;
   const TARGET = 250 + progressionBonus + difficulty.targetBonus;
@@ -28,6 +28,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
   let busy = false;
   let clearing = new Set();
   let message = "Combine 3 ou mais peças iguais!";
+  let selectedBooster = null;
 
   function randomPiece() {
     return Math.floor(Math.random() * TYPES.length);
@@ -446,10 +447,54 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
         ` : ""}
       </div>
 
+      <section class="board-boosters" aria-label="Itens consumíveis">
+        <div class="board-boosters-heading">ITENS CONSUMÍVEIS</div>
+        <div class="board-boosters-list">
+          <button class="board-booster ${selectedBooster === "hammer" ? "selected" : ""}" data-booster="hammer" ${(inventory.hammer || 0) < 1 ? "disabled" : ""} aria-label="Martelo, quantidade ${inventory.hammer || 0}">
+            <span class="booster-emoji">🔨</span><small>Martelo</small><b class="booster-quantity">${inventory.hammer || 0}</b>
+          </button>
+          <button class="board-booster ${selectedBooster === "rocket" ? "selected" : ""}" data-booster="rocket" ${(inventory.rocket || 0) < 1 ? "disabled" : ""} aria-label="Foguete, quantidade ${inventory.rocket || 0}">
+            <span class="booster-emoji">🚀</span><small>Foguete</small><b class="booster-quantity">${inventory.rocket || 0}</b>
+          </button>
+          <button class="board-booster ${selectedBooster === "rainbow" ? "selected" : ""}" data-booster="rainbow" ${(inventory.rainbow || 0) < 1 ? "disabled" : ""} aria-label="Bomba colorida, quantidade ${inventory.rainbow || 0}">
+            <span class="booster-emoji">💣</span><small>Bomba</small><b class="booster-quantity">${inventory.rainbow || 0}</b>
+          </button>
+          <button class="board-booster" data-booster="extra-moves" ${(inventory["extra-moves"] || 0) < 1 ? "disabled" : ""} aria-label="Mais cinco movimentos, quantidade ${inventory["extra-moves"] || 0}">
+            <span class="booster-emoji">➕</span><small>+5 jogadas</small><b class="booster-quantity">${inventory["extra-moves"] || 0}</b>
+          </button>
+        </div>
+        ${selectedBooster ? '<p class="booster-hint">Toque em uma peça do tabuleiro para usar o item.</p>' : ""}
+      </section>
+
       <p class="board-message">
         ${message}
       </p>
     `;
+
+    container.querySelectorAll("[data-booster]").forEach(button => {
+      button.addEventListener("click", () => {
+        const itemId = button.dataset.booster;
+        if (busy || (inventory[itemId] || 0) < 1 || moves <= 0 || score >= TARGET) return;
+
+        if (itemId === "extra-moves") {
+          inventory[itemId]--;
+          onInventoryChange(itemId, inventory[itemId]);
+          moves += 5;
+          message = "➕ Você ganhou mais 5 movimentos!";
+          selectedBooster = null;
+          render();
+          return;
+        }
+
+        selectedBooster = selectedBooster === itemId ? null : itemId;
+        message = selectedBooster
+          ? itemId === "hammer" ? "🔨 Escolha a peça que deseja remover."
+            : itemId === "rocket" ? "🚀 Escolha uma peça para disparar a linha."
+            : "💣 Escolha uma cor para eliminar todas as peças iguais."
+          : "Combine 3 ou mais peças iguais!";
+        render();
+      });
+    });
 
     const gameBoard = container.querySelector(".game-board");
 
@@ -461,6 +506,12 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
 
       const selectedRow = Number(piece.dataset.row);
       const selectedCol = Number(piece.dataset.col);
+
+      if (selectedBooster) {
+        event.preventDefault();
+        useSelectedBooster(selectedRow, selectedCol);
+        return;
+      }
 
       // A peça congelada não pode nem iniciar um arraste.
       if (ice[selectedRow][selectedCol]) {
@@ -534,6 +585,37 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
 
     gameBoard.addEventListener("pointerup", finishDrag);
     gameBoard.addEventListener("pointercancel", finishDrag);
+  }
+
+  function useSelectedBooster(row, col) {
+    const itemId = selectedBooster;
+    if (!itemId || busy || (inventory[itemId] || 0) < 1) return;
+
+    const targets = new Set();
+
+    if (itemId === "hammer") {
+      targets.add(`${row},${col}`);
+    } else if (itemId === "rocket") {
+      for (let c = 0; c < SIZE; c++) targets.add(`${row},${c}`);
+    } else if (itemId === "rainbow") {
+      const color = board[row][col];
+      if (typeof color !== "number") {
+        message = "Escolha uma peça de cor para usar a bomba.";
+        render();
+        return;
+      }
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          if (board[r][c] === color) targets.add(`${r},${c}`);
+        }
+      }
+    }
+
+    inventory[itemId]--;
+    onInventoryChange(itemId, inventory[itemId]);
+    selectedBooster = null;
+    busy = true;
+    activateTargets(targets);
   }
 
   function animateSwap(row1, col1, row2, col2, reverse = false) {
@@ -894,7 +976,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       `;
 
       container.querySelector("#retry-level").addEventListener("click", () => {
-        startBoard(container, onComplete, stage);
+        startBoard(container, onComplete, stage, onHome, inventory, onInventoryChange);
       });
     }
   }
