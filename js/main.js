@@ -136,9 +136,17 @@ try {
 }
 
 let cardPacks = Math.max(0, Number(localStorage.getItem("fq_card_packs") || 0));
+let completedCardSets = [];
+try {
+  const savedSets = JSON.parse(localStorage.getItem("fq_completed_card_sets") || "[]");
+  completedCardSets = Array.isArray(savedSets) ? savedSets : [];
+} catch {
+  completedCardSets = [];
+}
 function saveCardProgress() {
   localStorage.setItem("fq_cards", JSON.stringify(ownedCards));
   localStorage.setItem("fq_card_packs", String(cardPacks));
+  localStorage.setItem("fq_completed_card_sets", JSON.stringify(completedCardSets));
 }
 
 function renderCardArtwork(card, rarity) {
@@ -184,7 +192,32 @@ function drawOneCard() {
   const rarity = rollCardRarity();
   const found = { id: card.id, rarity: rarity.id };
   ownedCards.push(found);
+  checkCompletedCardSets();
   return { card, rarity };
+}
+
+function checkCompletedCardSets() {
+  const newlyCompleted = [];
+  CARD_CATALOG.forEach(card => {
+    const hasAllRarities = CARD_RARITIES.every(rarity =>
+      ownedCards.some(entry => entry.id === card.id && entry.rarity === rarity.id)
+    );
+    if (hasAllRarities && !completedCardSets.includes(card.id)) {
+      completedCardSets.push(card.id);
+      newlyCompleted.push(card);
+    }
+  });
+  if (newlyCompleted.length) {
+    const coinsReward = newlyCompleted.length * 250;
+    const packsReward = newlyCompleted.length;
+    player.coins += coinsReward;
+    cardPacks += packsReward;
+    savePlayer();
+    saveCardProgress();
+    renderHeader();
+    showToast("Coleção completa: " + newlyCompleted.map(card => card.name).join(", ") +
+      "! +" + coinsReward + " moedas e " + packsReward + " pacote(s) bônus.");
+  }
 }
 
 function grantCard() {
@@ -374,17 +407,30 @@ function renderCollection() {
   const uniqueFound = CARD_CATALOG.reduce((total, card) =>
     total + CARD_RARITIES.filter(rarity => ownedCards.some(entry => entry.id === card.id && entry.rarity === rarity.id)).length, 0);
 
-  const cardsHTML = CARD_CATALOG.flatMap(card => CARD_RARITIES.map(rarity => {
-    const count = ownedCards.filter(entry => entry.id === card.id && entry.rarity === rarity.id).length;
-    const className = count > 0 ? rarity.className : "locked " + rarity.className;
-    return '<article class="fusion-card ' + className + '">' +
-      '<div class="fusion-card-rarity">' + rarity.name + '</div>' +
-      '<div class="fusion-card-art">' + renderCardArtwork(card, rarity) + '</div>' +
-      '<strong class="fusion-card-name">' + card.name + '</strong>' +
-      '<span class="fusion-card-description">' + (count > 0 ? "Encontrada" : "Ainda não encontrada") + '</span>' +
-      '<span class="fusion-card-count">' + (count > 0 ? "×" + count : "—") + '</span>' +
-    '</article>';
-  })).join("");
+  const collectionsHTML = CARD_CATALOG.map(card => {
+    const foundCount = CARD_RARITIES.filter(rarity =>
+      ownedCards.some(entry => entry.id === card.id && entry.rarity === rarity.id)
+    ).length;
+    const isComplete = foundCount === CARD_RARITIES.length;
+    const cardsHTML = CARD_RARITIES.map(rarity => {
+      const count = ownedCards.filter(entry => entry.id === card.id && entry.rarity === rarity.id).length;
+      const className = count > 0 ? rarity.className : "locked " + rarity.className;
+      return '<article class="fusion-card ' + className + '">' +
+        '<div class="fusion-card-rarity">' + rarity.name + '</div>' +
+        '<div class="fusion-card-art">' + renderCardArtwork(card, rarity) + '</div>' +
+        '<strong class="fusion-card-name">' + card.name + '</strong>' +
+        '<span class="fusion-card-description">' + (count > 0 ? "Encontrada" : "Não encontrada") + '</span>' +
+        '<span class="fusion-card-count">' + (count > 0 ? "×" + count : "—") + '</span>' +
+      '</article>';
+    }).join("");
+    return '<section class="card-collection-set ' + (isComplete ? "set-complete" : "") + '">' +
+      '<div class="card-set-heading"><div><strong>' + card.name + '</strong><small>' +
+      foundCount + '/5 raridades descobertas</small></div><span>' + (isComplete ? "🏆 Completa" : "🔒 Em andamento") + '</span></div>' +
+      '<div class="card-set-progress"><i style="width:' + (foundCount / 5 * 100) + '%"></i></div>' +
+      '<div class="card-set-grid">' + cardsHTML + '</div>' +
+      '<div class="card-set-reward">' + (isComplete ? "✅ Recompensa recebida: 250 moedas + 1 pacote" : "🎁 Complete as 5 raridades e ganhe 250 moedas + 1 pacote") + '</div>' +
+    '</section>';
+  }).join("");
 
   screen.innerHTML = '<h2 class="section-title">🃏 Coleção de cartas</h2>' +
     '<div class="card-panel collection-progress"><div><strong>Cartas encontradas</strong><b>' + uniqueFound + '/' + totalCards + '</b></div>' +
@@ -393,8 +439,8 @@ function renderCollection() {
     '<small class="card-drop-rates">Chances por carta: Comum 70% • Rara 20% • Épica 7% • Lendária 2,9% • Ultimate 0,1%</small>' +
     '<small>Ao terminar uma fase: 15% de chance de encontrar um pacote.</small>' +
     '<button class="open-card-pack" id="open-card-pack" ' + (cardPacks > 0 ? "" : "disabled") + '>🎁 Abrir pacote (' + cardPacks + ')</button></div>' +
-    '<div class="fusion-card-grid">' + cardsHTML + '</div>' +
-    '<p class="collection-tip">Cada carta pode ser encontrada em cinco raridades. Repetidas contam como cópias extras, sem alterar a raridade.</p>';
+    '<div class="card-collections-list">' + collectionsHTML + '</div>' +
+    '<p class="collection-tip">Cada item tem sua própria coleção com cinco raridades. Repetidas aumentam apenas a quantidade, nunca a raridade.</p>';
 
   const openButton = document.getElementById("open-card-pack");
   if (openButton) openButton.addEventListener("click", openCardPack);
