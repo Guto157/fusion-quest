@@ -499,6 +499,7 @@ function navigate(destination) {
   if (!screens[destination]) return;
 
   currentScreen = destination;
+  document.getElementById("app").classList.toggle("collection-view", destination === "collection");
 
   const renderers = {
     home: renderHome,
