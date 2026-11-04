@@ -679,3 +679,8 @@ body{min-height:0}
 .card-back-pattern strong{font-family:Georgia,serif;font-size:43px;line-height:1;color:#e2eaff;text-shadow:0 2px 0 #536b9b,0 0 12px #8db7ff}
 .card-back-pattern span{font-size:13px;color:#d6c4ff}
 .card-back-caption{font-size:7px;font-weight:1000;letter-spacing:1px;color:#a9bbdf}
+
+
+/* Rolagem vertical da tela de coleções */
+.collection-view{height:100dvh;min-height:100vh;overflow:hidden}
+.collection-view #screen{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding-bottom:100px;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
