@@ -459,10 +459,20 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       if (!piece || busy || moves <= 0 || score >= TARGET) return;
       if (event.pointerType === "mouse" && event.button !== 0) return;
 
+      const selectedRow = Number(piece.dataset.row);
+      const selectedCol = Number(piece.dataset.col);
+
+      // A peça congelada não pode nem iniciar um arraste.
+      if (ice[selectedRow][selectedCol]) {
+        message = "🧊 Essa peça está congelada! Combine ao lado para liberar.";
+        render();
+        return;
+      }
+
       event.preventDefault();
       dragStart = {
-        row: Number(piece.dataset.row),
-        col: Number(piece.dataset.col),
+        row: selectedRow,
+        col: selectedCol,
         x: event.clientX,
         y: event.clientY,
         element: piece
