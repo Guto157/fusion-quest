@@ -330,3 +330,18 @@
 @media(max-width:380px){
   #board-container .game-board{gap:3px;padding:6px}
 }
+
+
+/* ITENS CONSUMIVEIS ABAIXO DO TABULEIRO */
+.board-boosters{margin-top:10px;padding:9px 8px 8px;border:1px solid #7395b366;border-radius:16px;background:linear-gradient(145deg,#203958ed,#14233ded);box-shadow:inset 0 1px 0 #ffffff18,0 6px 14px #02081766}
+.board-boosters-heading{margin:0 2px 8px;color:#c5d9ec;font-size:9px;font-weight:1000;letter-spacing:1px;text-align:center}
+.board-boosters-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.board-booster{position:relative;min-width:0;min-height:65px;padding:7px 3px 6px;border:1px solid #7899b477;border-radius:12px;background:linear-gradient(155deg,#385979,#1a304c);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:inset 0 2px 0 #ffffff30,0 3px 0 #0b1b30;cursor:pointer}
+.board-booster:active{transform:scale(.96)}
+.board-booster.selected{border:2px solid #75ffe0;background:linear-gradient(145deg,#286d70,#174b59);box-shadow:0 0 0 3px #45f0cf22,0 0 15px #45f0cf55}
+.board-booster:disabled{opacity:.42;filter:saturate(.5);cursor:not-allowed}
+.board-booster .booster-emoji{font-size:24px;line-height:26px}
+.board-booster small{font-size:8px;font-weight:900;white-space:nowrap}
+.board-booster .booster-quantity{position:absolute;top:-6px;right:-5px;min-width:19px;height:19px;padding:0 4px;border:2px solid #d9f8ff;border-radius:10px;background:linear-gradient(145deg,#ffdc78,#d18b27);color:#38230a;font-size:10px;font-weight:1000;line-height:15px;text-align:center;box-shadow:0 2px 5px #0008}
+.booster-hint{margin:7px 2px 0;color:#83f5dc;font-size:9px;text-align:center;font-weight:800}
+@media(max-width:360px){.board-boosters{padding:8px 5px}.board-boosters-list{gap:5px}.board-booster{min-height:60px}.board-booster .booster-emoji{font-size:21px}.board-booster small{font-size:7px}}
