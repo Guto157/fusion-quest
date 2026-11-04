@@ -362,6 +362,8 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
         }
       });
 
+      ice[row][col] = false;
+
       if (
         keep &&
         keep.row === row &&
@@ -371,7 +373,6 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       }
 
       board[row][col] = null;
-      ice[row][col] = false;
     });
 
     addPoints(matches.length);
