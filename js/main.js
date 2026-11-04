@@ -102,14 +102,14 @@ function getSelectedAvatar() {
 }
 
 const CARD_CATALOG = [
-  { id: "gema-azul", name: "Gema Azul", emoji: "🔵", rarity: "Comum", description: "Uma peça clássica do tabuleiro." },
-  { id: "gema-verde", name: "Gema Verde", emoji: "🟢", rarity: "Comum", description: "Energia verde para suas combinações." },
-  { id: "gema-amarela", name: "Gema Dourada", emoji: "🟡", rarity: "Comum", description: "Brilha a cada combinação." },
-  { id: "gema-vermelha", name: "Gema Rubi", emoji: "🔴", rarity: "Rara", description: "Uma joia de grande valor." },
-  { id: "gema-roxa", name: "Gema Violeta", emoji: "🟣", rarity: "Rara", description: "Uma peça rara do tabuleiro." },
-  { id: "gema-diamante", name: "Diamante Supremo", emoji: "💎", rarity: "Épica", description: "A joia mais preciosa do Fusion Quest." },
-  { id: "foguete", name: "Foguete Explosivo", emoji: "🚀", rarity: "Épica", description: "Limpa uma linha ou coluna inteira." },
-  { id: "bomba-colorida", name: "Bomba Colorida", emoji: "💣", rarity: "Lendária", description: "Elimina todas as peças de uma cor." }
+  { id: "gema-azul", name: "Gema Azul", emoji: "🔵", description: "Uma peça clássica do tabuleiro." },
+  { id: "gema-verde", name: "Gema Verde", emoji: "🟢", description: "Energia verde para suas combinações." },
+  { id: "gema-amarela", name: "Gema Dourada", emoji: "🟡", description: "Brilha a cada combinação." },
+  { id: "gema-vermelha", name: "Gema Rubi", emoji: "🔴", description: "Uma joia de grande valor." },
+  { id: "gema-roxa", name: "Gema Violeta", emoji: "🟣", description: "Uma peça rara do tabuleiro." },
+  { id: "gema-diamante", name: "Diamante Supremo", emoji: "💎", description: "A joia mais preciosa do Fusion Quest." },
+  { id: "foguete", name: "Foguete Explosivo", emoji: "🚀", description: "Limpa uma linha ou coluna inteira." },
+  { id: "bomba-colorida", name: "Bomba Colorida", emoji: "💣", description: "Elimina todas as peças de uma cor." }
 ];
 
 const CARD_RARITIES = [
@@ -157,7 +157,7 @@ function renderCardArtwork(card, rarity) {
     return '<svg viewBox="0 0 100 100" role="img" aria-label="Bomba Colorida"><defs><radialGradient id="bombBody" cx=".3" cy=".2"><stop stop-color="#fff"/><stop offset=".25" stop-color="#c9a5ff"/><stop offset="1" stop-color="#38215e"/></radialGradient></defs><path d="M59 22 Q68 9 82 12" fill="none" stroke="#b7a0a0" stroke-width="7" stroke-linecap="round"/><path d="M80 12 L87 4 M80 12 L91 14 M80 12 L77 2" stroke="#ffe16a" stroke-width="4" stroke-linecap="round"/><circle cx="48" cy="57" r="34" fill="url(#bombBody)" stroke="#fff" stroke-width="3"/><path d="M48 23 A34 34 0 0 1 80 68 L48 57Z" fill="#ff4b78" opacity=".9"/><path d="M17 68 A34 34 0 0 1 48 23 L48 57Z" fill="#28c9ff" opacity=".9"/><path d="M17 68 A34 34 0 0 0 80 68 L48 57Z" fill="#ffd23f" opacity=".9"/><circle cx="48" cy="57" r="34" fill="none" stroke="#fff" stroke-width="3"/><path d="M35 50 L61 50 L61 64 Q48 74 35 64Z" fill="#14172c"/><circle cx="41" cy="55" r="3" fill="#fff"/><circle cx="55" cy="55" r="3" fill="#fff"/><path d="M43 64 L48 59 L53 64" fill="none" stroke="#fff" stroke-width="2.5"/></svg>';
   }
   const colors = palette[card.id] || palette["gema-azul"];
-  const id = card.id.replace(/[^a-z0-9]/gi, "");
+  const id = (card.id + rarity.id).replace(/[^a-z0-9]/gi, "");
   return '<svg viewBox="0 0 100 100" role="img" aria-label="' + card.name + '">' +
     '<defs><linearGradient id="gem' + id + '" x1="0" y1="0" x2="1" y2="1"><stop stop-color="' + colors[0] + '"/><stop offset=".48" stop-color="' + colors[1] + '"/><stop offset="1" stop-color="' + colors[2] + '"/></linearGradient><linearGradient id="facet' + id + '" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="' + colors[1] + '" stop-opacity=".15"/></linearGradient></defs>' +
     '<path d="M50 5 L84 25 L94 57 L50 94 L6 57 L16 25Z" fill="url(#gem' + id + ')" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>' +
