@@ -416,3 +416,35 @@ body{min-height:0}
   .quest-node{width:48px;height:48px;left:50%}
   .quest-goal{font-size:7px}
 }
+
+
+/* TRILHA DE PEDRAS ENTRE CADA FASE */
+.quest-map:after{content:none!important}
+.quest-stone-trail{
+  position:absolute;
+  z-index:1;
+  left:50%;
+  top:68px;
+  width:38px;
+  height:136px;
+  transform:translateX(-50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-around;
+  pointer-events:none;
+}
+.quest-stone-trail i{
+  display:block;
+  width:15px;
+  height:10px;
+  border-radius:55% 45% 48% 52%;
+  background:linear-gradient(145deg,#f1e2bd 0%,#cbb58b 42%,#8d7958 78%,#5c5548 100%);
+  border:1px solid #f4e6c2aa;
+  box-shadow:inset 1px 1px 2px #fff9, inset -2px -2px 2px #554a38aa,0 3px 3px #081321aa;
+  transform:rotate(-12deg);
+}
+.quest-stone-trail i:nth-child(2n){width:12px;height:9px;transform:translateX(8px) rotate(18deg);background:linear-gradient(145deg,#e8d6ad,#a99570 68%,#665b48)}
+.quest-stone-trail i:nth-child(3n){width:17px;height:11px;transform:translateX(-7px) rotate(-24deg)}
+.quest-stone-trail i:nth-child(4n){width:11px;height:8px}
+.quest-node{z-index:3}
