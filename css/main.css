@@ -740,3 +740,14 @@ body{min-height:0}
  .store-view .shop-pack-actions{grid-template-columns:1fr 1fr}
  .store-view .shop-pack-chances{min-height:0}
 }
+
+
+/* RESERVAR ESPACO DO MENU INFERIOR EM TODAS AS TELAS */
+#screen{
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-bottom:calc(78px + env(safe-area-inset-bottom));
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+}
