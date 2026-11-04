@@ -364,7 +364,13 @@ body{min-height:0}
   top:0;
   bottom:0;
   left:50%;
-  border-left:4px dashed #f2d99b99;
+  width:6px;
+  left:calc(50% - 3px);
+  border-left:0;
+  background-image:radial-gradient(circle,#f2d99b 2px,transparent 2.7px);
+  background-size:6px 14px;
+  background-position:center top;
+  background-repeat:repeat-y;
   pointer-events:none;
 }
 .quest-stop{
