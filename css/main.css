@@ -568,3 +568,48 @@ body{min-height:0}
   .fusion-card{min-height:150px;padding-top:7px}
   .fusion-card-art{height:56px;flex-basis:56px;font-size:45px;margin:4px 0}
 }
+
+
+/* ACABAMENTO PROGRESSIVO DO MESMO ITEM ORIGINAL EM CADA RARIDADE */
+.fusion-card-art{position:relative;z-index:0}
+.fusion-card-art:before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:48px;height:48px;
+  border-radius:50%;
+  opacity:0;
+  background:radial-gradient(circle at 32% 25%,#ffffff55,transparent 38%),radial-gradient(circle,#ffffff18,#ffffff03 68%,transparent 72%);
+}
+.fusion-card.rare .fusion-card-art:before{
+  opacity:1;width:54px;height:54px;border:2px solid #b7edff;
+  background:radial-gradient(circle at 30% 25%,#ffffff88,transparent 32%),linear-gradient(145deg,#4edcff,#1973c7 55%,#10345e);
+  box-shadow:inset 0 2px 5px #fff9,0 3px 0 #09294a,0 0 9px #45c8ff;
+}
+.fusion-card.epic .fusion-card-art:before{
+  opacity:1;width:58px;height:58px;border:2px solid #e5c6ff;
+  background:radial-gradient(circle at 30% 22%,#fff9,transparent 34%),linear-gradient(145deg,#e2b4ff,#8b4be0 48%,#38205f);
+  box-shadow:inset 0 3px 7px #fff9,inset 0 -5px 8px #24113f,0 5px 0 #25153e,0 0 13px #bd79ff;
+}
+.fusion-card.legendary .fusion-card-art:before{
+  opacity:1;width:62px;height:62px;border:2px solid #fff0b0;
+  background:radial-gradient(circle at 30% 20%,#fff 0%,#ffe7a3 12%,transparent 38%),conic-gradient(from 25deg,#fff0a8,#e78c36,#fff4c5,#a65c24,#ffe8a0);
+  box-shadow:inset 0 0 0 3px #9a632b,inset 0 2px 8px #fff,0 0 13px #ffd166;
+}
+.fusion-card.ultimate .fusion-card-art:before{
+  opacity:1;width:64px;height:64px;border:2px solid #fff;
+  background:radial-gradient(circle at 30% 18%,#fff 0%,#dffaff 9%,transparent 35%),linear-gradient(145deg,#fff,#8beaff 22%,#bd79ff 48%,#ff62d5 72%,#fff0a8);
+  box-shadow:inset 0 0 0 3px #7543a7,inset 0 2px 8px #fff,0 0 8px #fff,0 0 17px #ff62d5,0 0 25px #45c8ff;
+}
+.fusion-card.legendary .fusion-card-art:after,
+.fusion-card.ultimate .fusion-card-art:after{
+  content:"✦";
+  position:absolute;
+  top:-3px;right:0;
+  color:#fff8d8;
+  font-size:17px;
+  text-shadow:0 0 5px #fff,0 0 12px var(--card-neon);
+  animation:cardSparkle 2.4s ease-in-out infinite;
+}
+.fusion-card.ultimate .fusion-card-art:after{content:"✧";font-size:22px;color:#fff}
+@keyframes cardSparkle{0%,100%{opacity:.45;transform:scale(.8) rotate(0)}50%{opacity:1;transform:scale(1.2) rotate(25deg)}}
