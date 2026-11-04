@@ -684,3 +684,22 @@ body{min-height:0}
 /* Rolagem vertical da tela de coleções */
 .collection-view{height:100dvh;min-height:100vh;overflow:hidden}
 .collection-view #screen{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding-bottom:100px;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+
+
+/* Loja de pacotes de cartas por raridade */
+.store-subtitle{font-size:15px;margin:18px 2px 7px;color:#f1f6ff}
+.store-pack-limit{font-size:10px;line-height:1.45;color:#aebed2;margin:0 3px 10px}
+.shop-card-packs-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.shop-card-pack{min-width:0;padding:12px;border:1px solid color-mix(in srgb,var(--pack-color) 65%,#344a70);border-radius:14px;background:linear-gradient(145deg,#1a2b49,#101a30);box-shadow:inset 0 0 18px color-mix(in srgb,var(--pack-color) 9%,transparent),0 5px 13px #02081766}
+.shop-pack-top{display:flex;align-items:center;gap:9px}
+.shop-pack-icon{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:11px;background:color-mix(in srgb,var(--pack-color) 17%,#101a30);border:1px solid var(--pack-color);font-size:23px}
+.shop-pack-top>div{flex:1;min-width:0}
+.shop-pack-top strong{font-size:13px;color:var(--pack-color)}
+.shop-pack-top p{font-size:9px;color:#aebed2;margin-top:3px;line-height:1.35}
+.shop-pack-price{font-size:11px;white-space:nowrap;color:#ffdf8b}
+.shop-pack-chances{margin:10px 0 9px;padding:7px 8px;border-radius:8px;background:#091426;color:#c5d2e8;font-size:9px;line-height:1.7}
+.shop-pack-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.shop-pack-actions button{min-width:0;padding:9px 5px;border-radius:8px;font-size:10px;font-weight:900}
+.shop-pack-actions .store-buy-coins{background:linear-gradient(110deg,#6e4a17,#a97825);color:#fff0c2;border:1px solid #d6a94c}
+.shop-pack-actions .store-buy-ad{background:linear-gradient(110deg,#174f49,#207d70);color:#c7fff0;border:1px solid #35bda4}
+.shop-pack-actions button:disabled{opacity:.42;filter:grayscale(.7)}
