@@ -37,6 +37,37 @@ function saveInventory() {
   localStorage.setItem("fq_inventory", JSON.stringify(inventory));
 }
 
+function getDailyCardPackUsage() {
+  const today = new Date().toLocaleDateString("en-CA");
+  let usage = {};
+  try {
+    const saved = JSON.parse(localStorage.getItem("fq_daily_card_pack_usage") || "{}");
+    usage = saved && saved.date === today && saved.packs ? saved.packs : {};
+  } catch {
+    usage = {};
+  }
+  return { date: today, packs: usage };
+}
+
+let dailyCardPackUsage = getDailyCardPackUsage();
+
+function saveDailyCardPackUsage() {
+  localStorage.setItem("fq_daily_card_pack_usage", JSON.stringify(dailyCardPackUsage));
+}
+
+function getCardPackUsage(packId) {
+  const usage = dailyCardPackUsage.packs[packId] || { coins: 0, video: 0 };
+  return { coins: Math.min(3, Number(usage.coins) || 0), video: Math.min(1, Number(usage.video) || 0) };
+}
+
+const CARD_SHOP_PACKS = [
+  { id: "common", name: "Pacote Comum", emoji: "📦", price: 300, chances: [85, 12, 2.5, 0.49, 0.01], color: "#7ee68b", description: "Maior chance de cartas comuns." },
+  { id: "rare", name: "Pacote Raro", emoji: "💠", price: 600, chances: [45, 35, 15, 4.5, 0.5], color: "#45c8ff", description: "Mais chances de cartas raras e superiores." },
+  { id: "epic", name: "Pacote Épico", emoji: "🔮", price: 1000, chances: [20, 30, 35, 13, 2], color: "#bd79ff", description: "Boa chance de conseguir cartas épicas." },
+  { id: "legendary", name: "Pacote Lendário", emoji: "👑", price: 1600, chances: [10, 20, 30, 30, 10], color: "#ffd166", description: "Chance elevada de cartas lendárias." },
+  { id: "ultimate", name: "Pacote Ultimate", emoji: "🌟", price: 2500, chances: [5, 10, 20, 30, 35], color: "#ff62d5", description: "A melhor chance de encontrar uma Ultimate." }
+];
+
 function buyStoreItem(itemId) {
   const item = STORE_ITEMS.find(entry => entry.id === itemId);
   if (!item) return;
@@ -51,6 +82,37 @@ function buyStoreItem(itemId) {
   renderHeader();
   renderStore();
   showToast(item.name + " adicionado à sua mochila!");
+}
+
+function buyCardShopPack(packId, method) {
+  const pack = CARD_SHOP_PACKS.find(entry => entry.id === packId);
+  if (!pack) return;
+  const usage = getCardPackUsage(packId);
+  if (method === "coins") {
+    if (usage.coins >= 3) {
+      showToast("Limite diário de compras deste pacote atingido.");
+      return;
+    }
+    if (player.coins < pack.price) {
+      showToast("Moedas insuficientes para este pacote.");
+      return;
+    }
+    player.coins -= pack.price;
+    usage.coins += 1;
+  } else {
+    showToast("Os vídeos recompensados estarão disponíveis na versão Android.");
+    return;
+  }
+
+  dailyCardPackUsage.packs[packId] = usage;
+  saveDailyCardPackUsage();
+  const foundCards = [drawOneCard(pack.chances), drawOneCard(pack.chances), drawOneCard(pack.chances)];
+  savePlayer();
+  saveCardProgress();
+  renderHeader();
+  renderStore();
+  const summary = foundCards.map(found => found.card.name + " (" + found.rarity.name + ")").join(", ");
+  showToast(pack.name + " aberto! " + summary);
 }
 
 function renderStore() {
@@ -72,18 +134,47 @@ function renderStore() {
     `;
   }).join("");
 
+  const cardPacksHTML = CARD_SHOP_PACKS.map(pack => {
+    const usage = getCardPackUsage(pack.id);
+    const chances = CARD_RARITIES.map((rarity, index) => rarity.name + " " + pack.chances[index] + "%").join(" • ");
+    return `
+      <article class="shop-card-pack" style="--pack-color:${pack.color}">
+        <div class="shop-pack-top">
+          <span class="shop-pack-icon">${pack.emoji}</span>
+          <div><strong>${pack.name}</strong><p>${pack.description}</p></div>
+          <b class="shop-pack-price">🪙 ${pack.price}</b>
+        </div>
+        <div class="shop-pack-chances">${chances}</div>
+        <div class="shop-pack-actions">
+          <button class="store-buy-coins" data-buy-card-pack="${pack.id}" ${usage.coins >= 3 ? "disabled" : ""}>🪙 Comprar (${usage.coins}/3)</button>
+          <button class="store-buy-ad" data-buy-card-pack-video="${pack.id}" disabled title="Vídeo recompensado disponível na versão Android">▶ Vídeo (${usage.video}/1)</button>
+        </div>
+      </article>
+    `;
+  }).join("");
+
   screen.innerHTML = `
     <h2 class="section-title">🛒 Loja do aventureiro</h2>
     <div class="store-intro card-panel">
       <div><strong>Prepare-se para as fases!</strong><p>Compre itens usando as moedas que você ganha jogando.</p></div>
       <span>🪙 ${player.coins}</span>
     </div>
+    <h3 class="store-subtitle">🃏 Pacotes de cartas</h3>
+    <p class="store-pack-limit">Cada pacote contém 3 cartas aleatórias. Limite diário por pacote: 3 compras com moedas e 1 vídeo recompensado.</p>
+    <div class="shop-card-packs-list">${cardPacksHTML}</div>
+    <h3 class="store-subtitle">⚡ Itens para as fases</h3>
     <div class="store-list">${cards}</div>
-    <p class="store-ad-note">Os anúncios recompensados serão ativados na versão Android, após a integração com o Google AdMob.</p>
+    <p class="store-ad-note">Os vídeos recompensados serão ativados na versão Android, após a integração com o Google AdMob.</p>
   `;
 
   screen.querySelectorAll("[data-buy-item]").forEach(button => {
     button.addEventListener("click", () => buyStoreItem(button.dataset.buyItem));
+  });
+  screen.querySelectorAll("[data-buy-card-pack]").forEach(button => {
+    button.addEventListener("click", () => buyCardShopPack(button.dataset.buyCardPack, "coins"));
+  });
+  screen.querySelectorAll("[data-buy-card-pack-video]").forEach(button => {
+    button.addEventListener("click", () => buyCardShopPack(button.dataset.buyCardPackVideo, "video"));
   });
 }
 
@@ -177,19 +268,23 @@ function renderCardArtwork(card, rarity) {
   return '<svg viewBox="0 0 100 100" role="img" aria-label="' + card.name + '"><defs><linearGradient id="gem' + key + '" x1="0" y1="0" x2="1" y2="1"><stop stop-color="' + colors[0] + '"/><stop offset=".48" stop-color="' + colors[1] + '"/><stop offset="1" stop-color="' + colors[2] + '"/></linearGradient><linearGradient id="facet' + key + '" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="' + colors[1] + '" stop-opacity=".15"/></linearGradient></defs>' + ornament + '<path d="M50 5 L84 25 L94 57 L50 94 L6 57 L16 25Z" fill="url(#gem' + key + ')" stroke="#fff" stroke-width="' + style.width + '" stroke-linejoin="round"/><path d="M16 25 L50 5 L50 48 L6 57Z" fill="url(#facet' + key + ')"/><path d="M50 5 L84 25 L94 57 L50 48Z" fill="#fff" opacity=".28"/><path d="M6 57 L50 48 L50 94Z" fill="' + colors[2] + '" opacity=".52"/><path d="M94 57 L50 48 L50 94Z" fill="' + colors[1] + '" opacity=".62"/><path d="M16 25 L84 25 M50 5 L50 48 M6 57 L50 48 L94 57" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="2"/><path d="M25 27 L43 17" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/></svg>';
 }
 
-function rollCardRarity() {
-  const roll = Math.random() * 100;
+function rollCardRarity(chances = null) {
+  const weights = Array.isArray(chances) && chances.length === CARD_RARITIES.length
+    ? chances
+    : CARD_RARITIES.map(rarity => rarity.chance);
+  const total = weights.reduce((sum, chance) => sum + chance, 0);
+  const roll = Math.random() * total;
   let edge = 0;
-  for (const rarity of CARD_RARITIES) {
-    edge += rarity.chance;
-    if (roll < edge) return rarity;
+  for (let index = 0; index < CARD_RARITIES.length; index++) {
+    edge += weights[index];
+    if (roll < edge) return CARD_RARITIES[index];
   }
   return CARD_RARITIES[CARD_RARITIES.length - 1];
 }
 
-function drawOneCard() {
+function drawOneCard(chances = null) {
   const card = CARD_CATALOG[Math.floor(Math.random() * CARD_CATALOG.length)];
-  const rarity = rollCardRarity();
+  const rarity = rollCardRarity(chances);
   const found = { id: card.id, rarity: rarity.id };
   ownedCards.push(found);
   checkCompletedCardSets();
