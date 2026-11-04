@@ -15,6 +15,78 @@ const player = {
 let currentScreen = "home";
 let selectedStage = player.stage;
 
+const STORE_ITEMS = [
+  { id: "hammer", name: "Martelo", emoji: "🔨", description: "Remove uma peça escolhida do tabuleiro.", price: 150 },
+  { id: "rocket", name: "Foguete", emoji: "🚀", description: "Dispara uma linha inteira de peças.", price: 250 },
+  { id: "rainbow", name: "Bomba colorida", emoji: "💣", description: "Elimina todas as peças de uma mesma cor.", price: 350 },
+  { id: "extra-moves", name: "+5 movimentos", emoji: "➕", description: "Adiciona cinco movimentos à sua partida.", price: 200 }
+];
+
+let inventory = {};
+try {
+  const savedInventory = JSON.parse(localStorage.getItem("fq_inventory") || "{}");
+  inventory = savedInventory && typeof savedInventory === "object" ? savedInventory : {};
+} catch {
+  inventory = {};
+}
+STORE_ITEMS.forEach(item => {
+  inventory[item.id] = Math.max(0, Number(inventory[item.id]) || 0);
+});
+
+function saveInventory() {
+  localStorage.setItem("fq_inventory", JSON.stringify(inventory));
+}
+
+function buyStoreItem(itemId) {
+  const item = STORE_ITEMS.find(entry => entry.id === itemId);
+  if (!item) return;
+  if (player.coins < item.price) {
+    showToast("Moedas insuficientes para comprar este item.");
+    return;
+  }
+  player.coins -= item.price;
+  inventory[item.id] = (inventory[item.id] || 0) + 1;
+  savePlayer();
+  saveInventory();
+  renderHeader();
+  renderStore();
+  showToast(item.name + " adicionado à sua mochila!");
+}
+
+function renderStore() {
+  const cards = STORE_ITEMS.map(item => {
+    const quantity = inventory[item.id] || 0;
+    return `
+      <article class="store-item">
+        <div class="store-item-art">${item.emoji}</div>
+        <div class="store-item-info">
+          <strong>${item.name}</strong>
+          <p>${item.description}</p>
+          <small>Na mochila: <b>${quantity}</b></small>
+        </div>
+        <div class="store-item-actions">
+          <button class="store-buy-coins" data-buy-item="${item.id}">🪙 ${item.price}</button>
+          <button class="store-buy-ad" disabled title="Disponível na versão Android">▶ Anúncio</button>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  screen.innerHTML = `
+    <h2 class="section-title">🛒 Loja do aventureiro</h2>
+    <div class="store-intro card-panel">
+      <div><strong>Prepare-se para as fases!</strong><p>Compre itens usando as moedas que você ganha jogando.</p></div>
+      <span>🪙 ${player.coins}</span>
+    </div>
+    <div class="store-list">${cards}</div>
+    <p class="store-ad-note">Os anúncios recompensados serão ativados na versão Android, após a integração com o Google AdMob.</p>
+  `;
+
+  screen.querySelectorAll("[data-buy-item]").forEach(button => {
+    button.addEventListener("click", () => buyStoreItem(button.dataset.buyItem));
+  });
+}
+
 const AVATARS = [
   { id: "homem", name: "Aventureiro", emoji: "👨🏻" },
   { id: "mulher", name: "Aventureira", emoji: "👩🏻" },
@@ -85,6 +157,7 @@ const screens = {
   game: { title: "Jogar", icon: "🎮" },
   collection: { title: "Cartas", icon: "🃏" },
   rewards: { title: "Prêmios", icon: "🎁" },
+  store: { title: "Loja", icon: "🛒" },
   settings: { title: "Ajustes", icon: "⚙️" }
 };
 
@@ -308,6 +381,7 @@ function navigate(destination) {
     game: renderGame,
     collection: renderCollection,
     rewards: renderRewards,
+    store: renderStore,
     settings: renderSettings
   };
 
