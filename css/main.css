@@ -307,7 +307,7 @@ body{min-height:0}
 /* COLEÇÃO: OITO CARTAS EM GRADE COMPACTA */
 #screen:has(.section-title + .card-panel){}
 #screen>div[style*="grid-template-columns:repeat(2"]{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;min-height:0;}
-#screen>div[style*="grid-template-columns:repeat(2"]>div{min-height:0!important;height:clamp(105px,18dvh,135px);padding:6px 3px!important;overflow:hidden}
+#screen>div[style*="grid-template-columns:repeat(2"]>div{min-height:0!important;height:clamp(82px,14dvh,110px);padding:6px 3px!important;overflow:hidden}
 #screen>div[style*="grid-template-columns:repeat(2"]>div>div{font-size:29px!important}
 #screen>div[style*="grid-template-columns:repeat(2"]>div svg{width:36px;height:36px}
 #screen>div[style*="grid-template-columns:repeat(2"]>div strong{font-size:9px!important;margin-top:4px!important}
