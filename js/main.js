@@ -138,12 +138,8 @@ function getStageMapInfo(stage) {
 }
 
 function renderHome() {
-  const world = Math.ceil(player.stage / 10);
-  const worldStart = (world - 1) * 10 + 1;
-  const worldEnd = world * 10;
-  const firstVisible = Math.max(worldStart, Math.min(player.stage - 1, worldEnd - 2));
-  const visibleStages = [firstVisible, firstVisible + 1, firstVisible + 2].filter(stage => stage <= worldEnd);
-  const completedInWorld = Math.max(0, Math.min(10, player.stage - worldStart));
+  const lastVisibleStage = Math.max(10, player.stage + 10);
+  const visibleStages = Array.from({ length: lastVisibleStage }, (_, index) => index + 1);
 
   const stagesHTML = visibleStages.map((stage, index) => {
     const info = getStageMapInfo(stage);
@@ -152,8 +148,9 @@ function renderHome() {
     const isLocked = stage > player.stage;
     const stars = "★".repeat(info.stars) + "☆".repeat(5 - info.stars);
     const icon = isLocked ? "🔒" : isCurrent ? getSelectedAvatar().emoji : "🏆";
+    const side = index % 2 === 0 ? "left" : "right";
     return `
-      <div class="quest-stop stop-${index} ${isCompleted ? "done" : ""} ${isCurrent ? "active" : ""} ${isLocked ? "locked" : ""}">
+      <div class="quest-stop ${side} ${isCompleted ? "done" : ""} ${isCurrent ? "active" : ""} ${isLocked ? "locked" : ""}" data-stage-row="${stage}">
         <button class="quest-node" data-stage="${stage}" ${isLocked ? "disabled" : ""} aria-label="Fase ${stage}">
           <span class="quest-node-icon">${icon}</span>
           <strong>${stage}</strong>
@@ -168,17 +165,19 @@ function renderHome() {
   }).join("");
 
   screen.innerHTML = `
-    <div class="map-section-heading"><div><strong>Sua jornada</strong><small>Avance pelo caminho e desbloqueie novas fases</small></div><span>🌿</span></div>
-    <section class="quest-map">
+    <div class="map-section-heading"><div><strong>Sua jornada</strong><small>Deslize para cima e para baixo para explorar as fases</small></div><span>🌿</span></div>
+    <section class="quest-map" aria-label="Mapa de fases">
       <div class="quest-land quest-land-one"></div><div class="quest-land quest-land-two"></div>
-      <svg class="quest-route" viewBox="0 0 340 510" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M170 70 C170 135 65 125 65 220 S275 285 275 365 S170 425 170 475" />
-      </svg>
       ${stagesHTML}
-      <div class="map-more-hint">✨ Continue vencendo para revelar o próximo trecho do caminho</div>
     </section>
     <div class="map-account-progress"><span>NÍVEL ${player.level}</span><div class="map-account-track"><i style="width:${Math.min(player.xp,100)}%"></i></div><span>${player.xp}/100 XP</span></div>
   `;
+
+  const map = screen.querySelector(".quest-map");
+  const currentRow = map.querySelector('[data-stage-row="' + player.stage + '"]');
+  if (currentRow) {
+    map.scrollTop = Math.max(0, currentRow.offsetTop - (map.clientHeight / 2) + (currentRow.offsetHeight / 2));
+  }
 
   screen.querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => {
     const stage = Number(button.dataset.stage);
