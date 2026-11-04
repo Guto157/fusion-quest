@@ -151,6 +151,7 @@ function renderHome() {
     const side = index % 2 === 0 ? "left" : "right";
     return `
       <div class="quest-stop ${side} ${isCompleted ? "done" : ""} ${isCurrent ? "active" : ""} ${isLocked ? "locked" : ""}" data-stage-row="${stage}">
+        ${index < visibleStages.length - 1 ? '<div class="quest-stone-trail" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>' : ''}
         <button class="quest-node" data-stage="${stage}" ${isLocked ? "disabled" : ""} aria-label="Fase ${stage}">
           <span class="quest-node-icon">${icon}</span>
           <strong>${stage}</strong>
