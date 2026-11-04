@@ -363,14 +363,17 @@ body{min-height:0}
   z-index:1;
   top:0;
   bottom:0;
-  left:50%;
-  width:6px;
-  left:calc(50% - 3px);
-  border-left:0;
-  background-image:radial-gradient(circle,#f2d99b 2px,transparent 2.7px);
-  background-size:6px 14px;
+  left:calc(50% - 27px);
+  width:54px;
+  background-image:
+    radial-gradient(ellipse 7px 10px at 27px 8px,#e5d2a7 0 54%,#a8946c 72%,#655b49 82%,transparent 88%),
+    radial-gradient(ellipse 6px 8px at 11px 26px,#cbb78d 0 55%,#8b7958 73%,#5c5344 83%,transparent 89%),
+    radial-gradient(ellipse 7px 9px at 43px 43px,#ddc99e 0 54%,#98835f 72%,#5f5645 83%,transparent 89%),
+    radial-gradient(ellipse 5px 7px at 29px 51px,#bca77e 0 55%,#806f50 74%,transparent 89%);
+  background-size:54px 60px;
   background-position:center top;
   background-repeat:repeat-y;
+  filter:drop-shadow(0 2px 1px #101b28aa);
   pointer-events:none;
 }
 .quest-stop{
