@@ -69,18 +69,16 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
   }
 
   function createBoard() {
-    board = Array.from({ length: SIZE }, () =>
-      Array.from({ length: SIZE }, randomPiece)
-    );
+    do {
+      board = Array.from({ length: SIZE }, () =>
+        Array.from({ length: SIZE }, randomPiece)
+      );
+    } while (findMatches().length > 0);
 
     ice = Array.from({ length: SIZE }, () => Array(SIZE).fill(false));
     const iceCount = difficulty.obstacles || 0;
     const iceSpots = [[2, 2], [2, 4], [4, 2], [4, 4]];
     iceSpots.slice(0, iceCount).forEach(([row, col]) => { ice[row][col] = true; });
-
-    while (findMatches().length > 0) {
-      removeMatches(findMatches());
-    }
 
     score = 0;
 
@@ -234,6 +232,7 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
 
         for (const [nextRow, nextCol] of neighbors) {
           if (nextRow >= SIZE || nextCol >= SIZE) continue;
+          if (ice[row][col] || ice[nextRow][nextCol]) continue;
 
           if (
             isSpecial(board[row][col]) ||
@@ -266,7 +265,8 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
       for (let row = 0; row <= SIZE; row++) {
         if (
           row === SIZE ||
-          isSpecial(board[row][col])
+          isSpecial(board[row][col]) ||
+          ice[row][col]
         ) {
           const remaining = [];
 
@@ -293,7 +293,15 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
   function shuffleBoard() {
     message = "Sem jogadas possíveis! Embaralhando...";
 
-    const pieces = board.flat();
+    const movablePositions = [];
+    for (let row = 0; row < SIZE; row++) {
+      for (let col = 0; col < SIZE; col++) {
+        if (!ice[row][col] && !isSpecial(board[row][col])) {
+          movablePositions.push([row, col]);
+        }
+      }
+    }
+    const pieces = movablePositions.map(([row, col]) => board[row][col]);
     let attempts = 0;
 
     while (attempts < 1000) {
@@ -304,9 +312,9 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
 
-      board = Array.from({ length: SIZE }, (_, row) =>
-        shuffled.slice(row * SIZE, (row + 1) * SIZE)
-      );
+      movablePositions.forEach(([row, col], index) => {
+        board[row][col] = shuffled[index];
+      });
 
       if (
         findMatches().length === 0 &&
@@ -343,6 +351,17 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
     if (matches.length === 0) return;
 
     matches.forEach(([row, col]) => {
+      // Uma combinação quebra o gelo das casas vizinhas.
+      const neighbors = [
+        [row - 1, col], [row + 1, col],
+        [row, col - 1], [row, col + 1]
+      ];
+      neighbors.forEach(([r, c]) => {
+        if (r >= 0 && r < SIZE && c >= 0 && c < SIZE) {
+          ice[r][c] = false;
+        }
+      });
+
       if (
         keep &&
         keep.row === row &&
@@ -565,6 +584,13 @@ export function startBoard(container, onComplete, stage = 1, onHome = () => {}) 
 
   function swap(row1, col1, row2, col2) {
     if (busy) return;
+
+    // Peças sob gelo não podem ser selecionadas nem trocadas.
+    if (ice[row1][col1] || ice[row2][col2]) {
+      message = "🧊 Essa peça está congelada! Combine ao lado para liberar.";
+      render();
+      return;
+    }
 
     const firstPiece = board[row1][col1];
     const secondPiece = board[row2][col2];
