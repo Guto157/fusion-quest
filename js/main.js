@@ -165,7 +165,19 @@ function renderCardArtwork(card) {
 }
 
 function grantCard() {
-  const card = CARD_CATALOG[Math.floor(Math.random() * CARD_CATALOG.length)];
+  // Primeiro descobre as oito cartas. Depois evolui as que ainda não são Ultimate.
+  const undiscovered = CARD_CATALOG.filter(item => !ownedCards.includes(item.id));
+  const canUpgrade = CARD_CATALOG.filter(item =>
+    ownedCards.includes(item.id) && (Number(cardLevels[item.id]) || 0) < 4
+  );
+  const candidates = undiscovered.length ? undiscovered : canUpgrade;
+
+  if (candidates.length === 0) {
+    player.coins += 100;
+    return { duplicate: true, coins: 100 };
+  }
+
+  const card = candidates[Math.floor(Math.random() * candidates.length)];
   const alreadyOwned = ownedCards.includes(card.id);
 
   if (!alreadyOwned) {
@@ -176,19 +188,14 @@ function grantCard() {
   }
 
   const currentLevel = Math.max(0, Math.min(4, Number(cardLevels[card.id]) || 0));
-  if (currentLevel < 4) {
-    cardLevels[card.id] = currentLevel + 1;
-    saveCardProgress();
-    return {
-      duplicate: false,
-      card,
-      rarity: CARD_RARITIES[currentLevel + 1],
-      upgraded: true
-    };
-  }
-
-  player.coins += 100;
-  return { duplicate: true, coins: 100, card };
+  cardLevels[card.id] = currentLevel + 1;
+  saveCardProgress();
+  return {
+    duplicate: false,
+    card,
+    rarity: CARD_RARITIES[currentLevel + 1],
+    upgraded: true
+  };
 }
 
 const screens = {
@@ -338,9 +345,11 @@ function renderGame() {
     navigate("home");
 
     if (cardReward.duplicate) {
-      showToast("Fase concluída! +" + earnedCoins + " moedas e coleção completa.");
+      showToast("Carta Ultimate! +" + cardReward.coins + " moedas extras.");
+    } else if (cardReward.upgraded) {
+      showToast(cardReward.card.name + " evoluiu para " + cardReward.rarity.name + "!");
     } else {
-      showToast("Nova carta: " + cardReward.card.name + "! Recompensas adicionadas.");
+      showToast("Nova carta: " + cardReward.card.name + " (Comum)!");
     }
   }, selectedStage, () => {
     selectedStage = player.stage;
