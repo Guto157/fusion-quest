@@ -415,12 +415,18 @@ function renderCollection() {
     const cardsHTML = CARD_RARITIES.map(rarity => {
       const count = ownedCards.filter(entry => entry.id === card.id && entry.rarity === rarity.id).length;
       const className = count > 0 ? rarity.className : "locked " + rarity.className;
+      if (count === 0) {
+        return '<article class="fusion-card card-face-down" aria-label="Carta ainda não descoberta">' +
+          '<div class="card-back-pattern"><span>✦</span><strong>?</strong><span>✦</span></div>' +
+          '<span class="card-back-caption">DESCONHECIDA</span>' +
+        '</article>';
+      }
       return '<article class="fusion-card ' + className + '">' +
         '<div class="fusion-card-rarity">' + rarity.name + '</div>' +
         '<div class="fusion-card-art">' + renderCardArtwork(card, rarity) + '</div>' +
         '<strong class="fusion-card-name">' + card.name + '</strong>' +
-        '<span class="fusion-card-description">' + (count > 0 ? "Encontrada" : "Não encontrada") + '</span>' +
-        '<span class="fusion-card-count">' + (count > 0 ? "×" + count : "—") + '</span>' +
+        '<span class="fusion-card-description">Encontrada</span>' +
+        '<span class="fusion-card-count">×' + count + '</span>' +
       '</article>';
     }).join("");
     return '<section class="card-collection-set ' + (isComplete ? "set-complete" : "") + '">' +
