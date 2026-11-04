@@ -448,3 +448,25 @@ body{min-height:0}
 .quest-stone-trail i:nth-child(3n){width:17px;height:11px;transform:translateX(-7px) rotate(-24deg)}
 .quest-stone-trail i:nth-child(4n){width:11px;height:8px}
 .quest-node{z-index:3}
+
+
+
+/* LOJA DE ITENS */
+.store-intro{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;margin-bottom:10px}
+.store-intro strong{font-size:13px}
+.store-intro p{font-size:10px;color:#b7c5dc;margin-top:4px;line-height:1.4}
+.store-intro>span{flex:0 0 auto;padding:9px 11px;border-radius:12px;background:#304968;border:1px solid #7797b477;font-size:12px;font-weight:900}
+.store-list{display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;padding:2px 2px 8px}
+.store-item{display:grid;grid-template-columns:48px minmax(0,1fr);gap:9px;align-items:center;padding:10px;border:1px solid #6b8aaa55;border-radius:15px;background:linear-gradient(145deg,#203958ed,#14233ded);box-shadow:inset 0 1px 0 #ffffff12,0 5px 12px #030a1855}
+.store-item-art{width:46px;height:46px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,#496989,#263f5d);font-size:27px;box-shadow:inset 0 2px 5px #ffffff33,0 4px 8px #07132388}
+.store-item-info{min-width:0}
+.store-item-info strong{font-size:12px}
+.store-item-info p{font-size:9px;color:#b7c5dc;line-height:1.3;margin:3px 0}
+.store-item-info small{font-size:9px;color:#91a9c3}
+.store-item-info small b{color:#8affdf}
+.store-item-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.store-item-actions button{padding:9px 6px;border-radius:10px;font-size:10px;font-weight:900}
+.store-buy-coins{color:#07333a;background:linear-gradient(180deg,#75ffe0,#20bba9);box-shadow:inset 0 2px 0 #ffffff77,0 3px 0 #075c68}
+.store-buy-ad{color:#d5e3f3;background:#344b6d;border:1px solid #8aa6c255}
+.store-buy-ad:disabled{opacity:.48;cursor:not-allowed}
+.store-ad-note{flex:0 0 auto;text-align:center;color:#91a9c3;font-size:9px;line-height:1.4;padding:4px 8px 0}
