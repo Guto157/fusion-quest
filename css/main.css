@@ -613,3 +613,29 @@ body{min-height:0}
 }
 .fusion-card.ultimate .fusion-card-art:after{content:"✧";font-size:22px;color:#fff}
 @keyframes cardSparkle{0%,100%{opacity:.45;transform:scale(.8) rotate(0)}50%{opacity:1;transform:scale(1.2) rotate(25deg)}}
+
+
+/* Coleção completa: 40 cartas individuais, arte vetorial e raridades */
+.fusion-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:5px 4px 18px}
+.fusion-card{min-height:166px}
+.fusion-card-art{width:86px;height:78px;flex:0 0 78px;margin:5px 0 3px;display:grid;place-items:center}
+.fusion-card-art svg{width:76px;height:76px;overflow:visible;filter:drop-shadow(0 4px 3px #020817cc)}
+.fusion-card-name{font-size:10px;min-height:22px}
+.fusion-card-description{font-size:8px;min-height:14px}
+.fusion-card-count{font-size:11px;font-weight:1000;color:#fff;background:#081426b8;border:1px solid var(--card-neon);border-radius:20px;padding:2px 9px;margin-top:3px;box-shadow:0 0 8px color-mix(in srgb,var(--card-neon) 50%,transparent)}
+.open-card-pack{width:100%;margin-top:9px;padding:10px 12px;border:1px solid #ffd166;border-radius:10px;background:linear-gradient(110deg,#6e3e15,#b87922);color:#fff;font-weight:900;box-shadow:0 0 12px #ffd16655}
+.open-card-pack:disabled{opacity:.45;filter:grayscale(.7)}
+.fusion-card.locked{opacity:.56;filter:saturate(.45)}
+.fusion-card.locked.common{--card-neon:#7ee68b}
+.fusion-card.locked.rare{--card-neon:#45c8ff}
+.fusion-card.locked.epic{--card-neon:#bd79ff}
+.fusion-card.locked.legendary{--card-neon:#ffd166}
+.fusion-card.locked.ultimate{--card-neon:#ff62d5}
+.fusion-card.rare .fusion-card-art svg{filter:drop-shadow(0 2px 0 #071a35) drop-shadow(0 0 5px #45c8ff) saturate(1.3)}
+.fusion-card.epic .fusion-card-art svg{filter:drop-shadow(0 5px 1px #25113e) drop-shadow(0 0 8px #bd79ff) saturate(1.5);transform:perspective(150px) rotateX(9deg) scale(1.04)}
+.fusion-card.legendary .fusion-card-art svg{filter:drop-shadow(0 0 5px #fff0a8) drop-shadow(0 0 12px #ff9f43) saturate(1.8) contrast(1.12);transform:scale(1.08)}
+.fusion-card.ultimate .fusion-card-art svg{filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 12px #ff62d5) drop-shadow(0 0 20px #7c5cff) saturate(1.9) contrast(1.15);transform:scale(1.1)}
+.fusion-card.ultimate{animation:ultimatePulse 3s ease-in-out infinite}
+@keyframes ultimatePulse{0%,100%{box-shadow:inset 0 0 18px #ff62d533,0 0 8px #ff62d5,0 0 18px #7c5cff88,0 7px 15px #02081788}50%{box-shadow:inset 0 0 24px #ff62d555,0 0 12px #fff,0 0 27px #7c5cff,0 7px 15px #02081788}}
+.collection-progress small{display:block}
+@media(max-width:360px){.fusion-card{min-height:155px}.fusion-card-art{width:74px;height:68px;flex-basis:68px}.fusion-card-art svg{width:66px;height:66px}}
