@@ -345,3 +345,65 @@ body{min-height:0}
   .quest-node{width:48px;height:48px;left:calc(50% - 24px)}
   .quest-goal{font-size:7px}
 }
+
+
+/* MAPA DE FASES COM NAVEGACAO VERTICAL */
+.quest-map{
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+  scrollbar-width:thin;
+  scrollbar-color:#7896a8 transparent;
+  padding:8px 0 14px;
+}
+.quest-map:after{
+  content:"";
+  position:absolute;
+  z-index:1;
+  top:0;
+  bottom:0;
+  left:50%;
+  border-left:4px dashed #f2d99b99;
+  pointer-events:none;
+}
+.quest-stop{
+  position:relative;
+  top:auto!important;
+  left:auto!important;
+  right:auto!important;
+  width:100%;
+  height:136px;
+  flex:0 0 136px;
+  z-index:2;
+}
+.quest-node{
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) rotate(-8deg);
+  z-index:3;
+}
+.quest-node>*{transform:rotate(8deg)}
+.quest-card{
+  top:50%;
+  width:calc(50% - 54px);
+  height:auto;
+  min-height:91px;
+  transform:translateY(-50%);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:3px;
+}
+.quest-stop.left .quest-card{left:10px;right:auto}
+.quest-stop.right .quest-card{right:10px;left:auto}
+.quest-stop.active .quest-node{transform:translate(-50%,-50%) rotate(-8deg)}
+.quest-map .quest-land{pointer-events:none}
+.quest-map .quest-land-one{top:120px}
+.quest-map .quest-land-two{bottom:120px}
+@media(max-width:380px){
+  .quest-stop{height:128px;flex-basis:128px}
+  .quest-card{width:calc(50% - 43px);padding:6px}
+  .quest-node{width:48px;height:48px;left:50%}
+  .quest-goal{font-size:7px}
+}
