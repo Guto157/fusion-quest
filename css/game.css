@@ -307,3 +307,26 @@
   65%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(2deg)}
   100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}
 }
+
+
+/* TABULEIRO ADAPTADO À ALTURA DISPONÍVEL */
+#board-container{display:flex;flex-direction:column;align-items:stretch;min-height:0;flex:1 1 auto}
+#board-container .stage-difficulty{flex:0 0 auto;margin-bottom:7px;padding:6px 9px}
+#board-container .board-info{flex:0 0 auto;gap:6px;margin-bottom:8px}
+#board-container .board-stat{padding:7px 4px;border-radius:10px}
+#board-container .board-stat span{font-size:8px;margin-bottom:3px}
+#board-container .board-stat strong{font-size:16px}
+#board-container .obstacle-info{flex:0 0 auto;margin:-4px 2px 6px;font-size:9px}
+#board-container .game-board{width:min(100%,calc(100dvh - 315px));max-width:100%;max-height:calc(100dvh - 315px);height:auto;aspect-ratio:1;margin:0 auto;flex:0 1 auto;min-height:0}
+#board-container .game-piece{font-size:clamp(15px,5.5vw,27px)}
+#board-container .board-message{display:none}
+#screen>.section-title{flex:0 0 auto;font-size:18px;margin:0 0 6px}
+@media(max-height:700px){
+  #board-container .game-board{width:min(100%,calc(100dvh - 275px));max-height:calc(100dvh - 275px)}
+  #board-container .stage-difficulty{padding:5px 8px;margin-bottom:5px}
+  #board-container .board-info{margin-bottom:5px}
+  #board-container .board-stat{padding:5px 3px}
+}
+@media(max-width:380px){
+  #board-container .game-board{gap:3px;padding:6px}
+}
